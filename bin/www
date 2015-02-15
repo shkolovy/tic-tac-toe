@@ -1,0 +1,274 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('node-js:server');
+var http = require('http');
+//var socket = require('socket.io');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+var io = require('socket.io').listen(server);
+
+var users = [null, null];
+var board;
+
+io.on('disconnect', function (socket) {
+
+});
+
+io.on('connection', function (socket) {
+
+  if(!users[0]){
+    users[0] = 'user1';
+  }
+  else if(!users[1]){
+    users[1] = 'user2';
+  }
+
+  if(users[0] && users[0]){
+    board = new Board();
+  }
+
+  console.log('connection');
+
+  socket.on('move', function (data) {
+    if(!users[0] || !users[1]){
+      io.sockets.emit('waitForUser');
+      return;
+    }
+
+    if(board.isOccupied(data.move)){
+        io.sockets.emit('occupied');
+        return;
+    }
+
+    board.set(data.move);
+
+    data.board = board.getBoard();
+
+    io.sockets.emit('show', data);
+
+    if(board.check(data.move)){
+      io.sockets.emit('winner');
+      return;
+    }
+
+    if(!board.hasMoves()){
+      io.sockets.emit('draw');
+      return;
+    }
+  });
+})
+
+
+
+function Board(){
+  var arr = [new Array(3), new Array(3),new Array(3)],
+      xTurn = true,
+      movesHistory = [];
+
+  function check(move){
+    debugger
+    var match = false;
+
+    //check vertical
+    for(var i = 0; i < 3; i++){
+      if(arr[i][move.y] === undefined){
+        match = false;
+        break;
+      }
+
+      match = i !== 0 && arr[i][move.y] === arr[i-1][move.y];
+    }
+
+    if(match){
+      return true;
+    }
+
+    //check horizontal
+    for(var i = 0; i < 3; i++){
+      if(arr[move.x][i] === undefined){
+        match = false;
+        break;
+      }
+
+      match = i !== 0 && arr[move.x][i] === arr[move.x][i-1];
+    }
+
+    if(match){
+      return true;
+    }
+
+    //not corner
+    if(move.x === 1 && move.y === 1){
+      return match;
+    }
+
+    //check diagonal
+    //middle
+    if(move.x === 1 && move.y === 1){
+      match = checkDiagonal(true);
+
+      if(!match){
+        checkDiagonal(false);
+      }
+    }
+    else{
+      checkDiagonal(move.y === 0);
+    }
+
+    return match;
+  };
+
+  function checkDiagonal(isLeft){
+    var match = false,
+        prevItem,
+        j = 0;
+
+    if(isLeft){
+      for(var i = 0; i < 3; i++){
+        if(arr[i][j] === undefined){
+          match = false;
+          break;
+        }
+
+        match = arr[i][j] === prevItem;
+        prevItem = arr[i][j];
+        j++;
+      }
+    }
+    else{
+      for(var i = 2; i <= 0; i--){
+        if(arr[i][j] === undefined){
+          match = false;
+          break;
+        }
+
+        match = arr[i][j] === prevItem;
+        prevItem = arr[i][j];
+        j++;
+      }
+    }
+
+    return match;
+  };
+
+  function isXTurn(){
+    return xTurn;
+  };
+
+  function set(move){
+    arr[move.x][move.y] = xTurn ? 1 : 0;
+    xTurn = !xTurn;
+    movesHistory.push({
+      move: move,
+      value: arr[move.x][move.y]
+    });
+  };
+
+  function hasWinner(){
+
+  };
+
+  function hasMoves(){
+    return movesHistory.length < 9;
+  };
+
+  function isOccupied(move){
+    return arr[move.x][move.y] !== undefined;
+  };
+
+  function getBoard(){
+    return arr;
+  };
+
+  this.hasMoves = hasMoves;
+  this.isOccupied = isOccupied;
+  this.check = check;
+  this.set = set;
+  this.getBoard = getBoard;
+  this.isXTurn = isXTurn;
+};
