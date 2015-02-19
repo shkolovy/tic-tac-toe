@@ -1,18 +1,28 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
 
-  h2#nameLabel
+    //h2#nameLabel
+    //
+    //
+    //input#moveXText(type=text)
+    //input#moveYText(type=text)
+    //button#moveBtn move
+    //<br>
+    //div#boardLabel
+    //<br>
+    //div#movesLabel
+
+    div#messagesLbl
+    input#messageTxt(type=text, class='form-control')
+    button#addMessageBtn(class='btn btn-default') add message
 
 
-  input#moveXText(type=text)
-  input#moveYText(type=text)
-  button#moveBtn move
-  <br>
-  div#boardLabel
-  <br>
-  div#movesLabel
-  script(src='https://cdn.socket.io/socket.io-1.3.2.js')
-  script(src='javascripts/index.js')
+    div#gameBoardLbl
+        div#noGamesLbl no games :(
+    button#createGameBtn(class='btn btn-primary') create game
+
+    div#gameFieldLbl board will be here
+    button#leaveGameBtn(class='btn', style='display:none') leave game
+
+    script(src='javascripts/index.js')

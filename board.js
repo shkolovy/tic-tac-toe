@@ -128,4 +128,6 @@ function Board(){
     this.set = set;
     this.getBoard = getBoard;
     this.isXTurn = isXTurn;
-};
+}
+
+module.exports = Board;
