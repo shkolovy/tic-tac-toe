@@ -56,7 +56,7 @@ $(function(){
 
         $findGameContent.hide();
         $gameAreaContent.show();
-        $gameFieldLbl.text('game #' + id);
+        //$gameFieldLbl.text('game #' + id);
     });
 
     socket.on('updateGameBoardLine', function(data){

@@ -8,8 +8,8 @@ body {
 }
 
 .navbar {
-  background: #1fa67a;
-  border: 1px solid #23a68c;
+  background: #31b0d5;
+  border: 1px solid #46b8da;
   text-align: center;
   padding: 10px 0 0 0;
 }
@@ -96,8 +96,7 @@ font-size: 20px;
 }
 
 .tic-tac-toe label:hover {
-  background-color: #3d4250;
-
+  background-color: #31b0d5;
 }
 
 .tic-tac-toe label:hover:after {

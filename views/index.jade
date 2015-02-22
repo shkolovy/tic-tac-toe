@@ -14,16 +14,17 @@ block content
                 button#createGameBtn.btn.btn-info
                     span.glyphicon.glyphicon-triangle-right
                     |create new game
-
-
-
-
-
-
-
-
             div#gameAreaContent(style='display:none')
-                div#gameFieldLbl board will be here
+                div#gameFieldLbl.tic-tac-toe
+                    label.left.top
+                    label.middle.top.cross
+                    label.right.top.zero
+                    label.left.center.cross.checked
+                    label.middle.center.zero.checked
+                    label.right.center
+                    label.left.bottom
+                    label.middle.bottom
+                    label.right.bottom
                 button#leaveGameBtn.btn.btn-info
                     span.glyphicon.glyphicon-triangle-left
                     |leave game
@@ -40,7 +41,7 @@ block content
                         span.input-group-btn
                             button#addMessageBtn.btn.btn-info send
 
-    script(src='javascripts/index.js')
+
 
 
         //h2#nameLabel
