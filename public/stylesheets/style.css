@@ -3,8 +3,30 @@ body {
   background: url(http://subtlepatterns.com/patterns/photography.png);
 }
 
-.content{
+.right{
+  float: right;
+}
+
+#content{
   padding: 20px;
+}
+
+footer{
+  text-align: center;
+  color:#31b0d5;
+  font-size: 0.8em;
+  margin: 20px;
+  padding: 10px;
+}
+
+footer a,
+footer a:hover{
+  color: #31b0d5;
+  text-decoration: none;
+}
+
+footer .love{
+  color: #d9534f;
 }
 
 .navbar {

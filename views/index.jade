@@ -7,8 +7,8 @@ block content
             div#findGameContent
                 div.panel.panel-info
                     div.panel-heading
-                        h3.panel-title active games
-                            span#gamesCountLbl 1
+                        h3.panel-title games list
+                            span#gamesCountLbl.badge.right(title='active games', data-toggle='tooltip') 1
                     div#noGamesLbl.panel-body(style='display:none') no active games :(
                     ul#gameBoardLines.list-group
                 button#createGameBtn.btn.btn-info
@@ -31,8 +31,8 @@ block content
         div#chatContent.col-md-6
             div.panel.panel-info
                 div.panel-heading
-                    h3.panel-title users online
-                        span#usersOnlineCountLbl 1
+                    h3.panel-title chat room
+                        span#usersOnlineCountLbl.badge.right(title='users online', data-toggle='tooltip') 1
                 div#messageContainer.panel-body
                     div#messagesLbl
                 div.panel-footer

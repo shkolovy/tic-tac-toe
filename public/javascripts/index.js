@@ -6,6 +6,7 @@ $(function(){
     var socket = io.connect(),
         userName = 'none',
 
+        $content = $('#content'),
         $userNameLbl = $('#userNameLbl'),
         $messagesLbl = $('#messagesLbl'),
         $messageTxt = $('#messageTxt'),
@@ -166,12 +167,13 @@ $(function(){
     $gameBoardLines.on('click', 'button', joinGame);
     $leaveGameBtn.on('click', leaveGame);
     $messageTxt.on('keypress', addMessageOnEnterClick);
-
+    $('[data-toggle="tooltip"]').tooltip();
 
     userName = prompt("Please enter your name", userName);
 
     $userNameLbl.text('Hola ' + userName);
     socket.emit('newUser', userName);
+    $content.fadeIn(900);
 });
 
 
