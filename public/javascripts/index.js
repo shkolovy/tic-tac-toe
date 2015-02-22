@@ -5,63 +5,118 @@
 $(function(){
     var socket = io.connect(),
         userName = 'none',
+
+        $userNameLbl = $('#userNameLbl'),
         $messagesLbl = $('#messagesLbl'),
         $messageTxt = $('#messageTxt'),
+        $messageContainer = $('#messageContainer'),
+        $usersOnlineCountLbl = $('#usersOnlineCountLbl'),
+        $findGameContent = $('#findGameContent'),
+        $gameAreaContent = $('#gameAreaContent'),
         $addMessageBtn = $('#addMessageBtn'),
         $createGameBtn = $('#createGameBtn'),
         $gameFieldLbl = $('#gameFieldLbl'),
-        $gameBoardLbl = $('#gameBoardLbl'),
-        $leaveGameBtn = $('#leaveGameBtn');
+        //$gameBoardLbl = $('#gameBoardLbl'),
+        $leaveGameBtn = $('#leaveGameBtn'),
+        $noGamesLbl = $('#noGamesLbl'),
+        $gamesCountLbl = $('#gamesCountLbl'),
+        $gameBoardLines = $('#gameBoardLines');
 
-    socket.on('userLeft', function(userName){
-        console.log('user left ' + userName);
+    socket.on('updateUsersCount', function(count){
+        $usersOnlineCountLbl.text(count);
     });
 
-    socket.on('userJoined', function(userName){
-        console.log('user joined ' + userName);
+    socket.on('userLeft', function(data){
+        console.log('user left ' + data.userName);
+
+        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:cadetblue">' + data.userName + '</span> has left</div>');
+    });
+
+    socket.on('userJoined', function(data){
+        console.log('user joined ' + data.name);
+
+        if(data.user.id === socket.id){
+            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> Welcome to chat ;)</div>');
+        }
+        else{
+            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:cadetblue">' + data.user.name + '</span> has joined</div>');
+        }
     });
 
     socket.on('showMessage', function(data){
         console.log('message from ' + (data.user.id === socket.id ? 'you' : data.user.name) + ': ' + data.message);
-        $messagesLbl.append((data.user.id === socket.id ? 'you' : data.user.name) + ': ' + data.message + '<br>');
+        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:cadetblue">' +
+                            (data.user.id === socket.id ? 'you' : data.user.name) + '</span>: ' + data.message + '</div>');
+
+        $messageContainer.animate({ scrollTop: $messagesLbl.height() }, 'slow');
     });
 
     socket.on('showNewGame', function(id){
         console.log('show new game ' + id);
 
-        $createGameBtn.hide();
-        $leaveGameBtn.show();
+        $findGameContent.hide();
+        $gameAreaContent.show();
         $gameFieldLbl.text('game #' + id);
     });
 
-    socket.on('updateGameBoard', function(game){
-        console.log('update Game Board ' + game.id);
+    socket.on('updateGameBoardLine', function(data){
+        console.log('update Game Board ' + data.game.id);
 
-        displayGameLine(game);
+        $gameBoardLines.toggle(data.gamesCount > 0);
+        $noGamesLbl.toggle(data.gamesCount === 0);
+        $gamesCountLbl.text(data.gamesCount);
+        updateGameBoardLine(data.game);
     });
 
-    socket.on('fillGameBoard', function(games){
-        console.log('fill Game Board');
+    socket.on('refreshGameBoard', function(data){
+        console.log('refresh Game Board');
 
-        for (var property in games) {
-            displayGameLine(games[property]);
+        $gameBoardLines.html('');
+        $gamesCountLbl.text(data.gamesCount);
+        $noGamesLbl.toggle(data.gamesCount === 0);
+        $gameBoardLines.toggle(data.gamesCount > 0);
+
+        for (var property in data.games) {
+            $gameBoardLines.append(buildGameBoardLine(data.games[property]));
         }
     });
 
-    function displayGameLine(game){
-        var gameLine = '<div data-game-id="' + game.id + '">' + game.user1.name + ' vs ' +
-            (game.user2 ? game.user2.name : '-') +
-            (game.user2 ? game.score1 + ':' + game.score2 : (game.user1.id === socket.id ? '' : '<button>join</button>')) +
-            '</div>';
+    socket.on('serverUserLeft', function(){
+        console.log('server User Left');
 
-        var $existingGameLine = $gameBoardLbl.find('*[data-game-id="'+ game.id +'"]');
+        $findGameContent.show();
+        $gameAreaContent.hide();
+    });
 
-        if($existingGameLine.length > 0){
-            $existingGameLine.html(gameLine);
+    function getFormattedTime(timeStr){
+        var date = new Date(timeStr);
+        return date.getHours() + ':' + date.getMinutes()
+    }
+
+    function updateGameBoardLine(game){
+        var $existingGameLine = $gameBoardLines.find('*[data-game-id="'+ game.id +'"]');
+
+        if(!game.isRemoved){
+            var gameLine = buildGameBoardLine(game);
+
+            if($existingGameLine.length > 0){
+                $existingGameLine.replaceWith(gameLine);
+            }
+            else{
+                $gameBoardLines.append(gameLine);
+            }
         }
         else{
-            $gameBoardLbl.append(gameLine);
+            $existingGameLine.remove();
         }
+    }
+
+    function buildGameBoardLine(game){
+        return '<li class="list-group-item" data-game-id="' + game.id + '">' + game.user1.name + ' <span class="text-muted">vs</span> ' +
+            (game.user2 ? game.user2.name : '-') +
+            (game.user2 ? '<span class="label label-info">'+ game.score1 + ' : ' + game.score2 +'</span>' :
+            (game.user1.id === socket.id ? '' : '<button class="btn btn-default btn-xs">join</button>')) +
+            '</li>';
     }
 
     function addMessage(){
@@ -73,27 +128,49 @@ $(function(){
         $messageTxt.val('');
     }
 
-    function newGame(){
-        $createGameBtn.prop('disabled', true);
+    function createNewGame(){
+        //$createGameBtn.prop('disabled', true);
         socket.emit('newGame');
     }
 
-    function joinGame(){
-        var gameToJoinId = $(this).parent('div').data('game-id');
+    function leaveGame(){
+        socket.emit('leaveGame');
 
-        console.log(socket.id);
+        $findGameContent.show();
+        $gameAreaContent.hide();
+    }
+
+    function joinGame(){
+        var gameToJoinId = $(this).parent('li').data('game-id');
 
         socket.emit('joinGame', {
             gameId: gameToJoinId
         });
+
+        $findGameContent.hide();
+        $gameAreaContent.show();
     }
 
-    $addMessageBtn.on('click',addMessage);
-    $createGameBtn.on('click', newGame);
-    $gameBoardLbl.on('click', 'button', joinGame);
+    function addMessageOnEnterClick(e) {
+        var key = e.which;
+        if(key == 13){
+            if($(this).val().length > 0){
+                $addMessageBtn.click();
+                return false;
+            }
+        }
+    }
+
+    $addMessageBtn.on('click', addMessage);
+    $createGameBtn.on('click', createNewGame);
+    $gameBoardLines.on('click', 'button', joinGame);
+    $leaveGameBtn.on('click', leaveGame);
+    $messageTxt.on('keypress', addMessageOnEnterClick);
+
 
     userName = prompt("Please enter your name", userName);
 
+    $userNameLbl.text('Hola ' + userName);
     socket.emit('newUser', userName);
 });
 

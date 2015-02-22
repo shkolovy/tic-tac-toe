@@ -7,18 +7,27 @@ module.exports = function(server){
         board = require('./board'),
         users = {},
         boards = {},
-        games = {};
+        games = {},
+        gamesCount = 0,
+        userCount = 0;
 
     io.on('connection', onConnection);
 
     function onConnection(socket){
         console.log('connection ' + socket.id);
 
+        userCount++;
+
         socket.on('disconnect', function () {
             console.log('disconnect ' + socket.id);
 
+            userCount--;
             delete users[socket.id];
-            socket.broadcast.emit('userLeft', socket.userName);
+            socket.broadcast.emit('userLeft', {
+                userName: socket.userName,
+                time: new Date()
+            });
+            socket.broadcast.emit('updateUsersCount', userCount);
         });
 
         socket.on('newUser', function (userName){
@@ -30,42 +39,90 @@ module.exports = function(server){
                 name: userName
             };
 
-            socket.broadcast.emit('userJoined', socket.userName);
-            socket.emit('fillGameBoard', games);
+            io.emit('userJoined', {
+                user: users[socket.id],
+                time: new Date()
+            });
+
+            socket.emit('refreshGameBoard', {
+                games: games,
+                gamesCount: gamesCount
+            });
+
+            io.emit('updateUsersCount', userCount);
         });
 
         socket.on('newMessage', function (data){
             console.log('new message');
             io.emit('showMessage', {
                 message: data.message,
-                user: users[data.userId]
+                user: users[data.userId],
+                time: new Date()
             });
         });
 
         socket.on('newGame', function (){
+            console.log('new Game by user ', socket.id);
+
             var id = Math.random();
 
             games[id] = {
                id: id,
                user1: users[socket.id],
-               //board: new board()
                score1: 0,
                score2: 0
             };
 
+            gamesCount++;
+
+            users[socket.id].gameId = id;
+
             io.to(socket.id).emit('showNewGame', id);
-            io.emit('updateGameBoard', games[id]);
+            io.emit('updateGameBoardLine', {
+                game: games[id],
+                gamesCount: gamesCount
+            });
             console.log('new game ' + id);
         });
 
         socket.on('joinGame', function (data){
-            console.log('join Game', data);
+            console.log('join Game', data.gameId);
 
             var game = games[data.gameId];
             game.user2 = users[socket.id];
 
+            users[socket.id].gameId = game.id;
+
             io.to(socket.id).emit('showNewGame', game.id);
-            io.emit('updateGameBoard', game);
+
+            io.emit('updateGameBoardLine', {
+                game: game,
+                gamesCount: gamesCount
+            });
+        });
+
+        socket.on('leaveGame', function (){
+            var gameToLeaveId = users[socket.id].gameId,
+                gameToLeave = games[gameToLeaveId];
+
+            if(gameToLeave.user1 && gameToLeave.user1.id === socket.id){
+                gameToLeave.isRemoved = true;
+                delete games[gameToLeaveId];
+
+                gamesCount--;
+
+                if(gameToLeave.user2){
+                    io.to(gameToLeave.user2.id).emit('serverUserLeft');
+                }
+            }
+            else if(gameToLeave.user2 && gameToLeave.user2.id === socket.id){
+                gameToLeave.user2 = undefined;
+            }
+
+            io.emit('updateGameBoardLine', {
+                game: gameToLeave,
+                gamesCount: gamesCount
+            });
         });
     }
 

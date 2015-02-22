@@ -1,8 +1,49 @@
 extends layout
 
 block content
+    h3#userNameLbl
+    div.row
+        div#gameContent.col-md-6
+            div#findGameContent
+                div.panel.panel-info
+                    div.panel-heading
+                        h3.panel-title active games
+                            span#gamesCountLbl 1
+                    div#noGamesLbl.panel-body(style='display:none') no active games :(
+                    ul#gameBoardLines.list-group
+                button#createGameBtn.btn.btn-info
+                    span.glyphicon.glyphicon-triangle-right
+                    |create new game
 
-    //h2#nameLabel
+
+
+
+
+
+
+
+            div#gameAreaContent(style='display:none')
+                div#gameFieldLbl board will be here
+                button#leaveGameBtn.btn.btn-info
+                    span.glyphicon.glyphicon-triangle-left
+                    |leave game
+        div#chatContent.col-md-6
+            div.panel.panel-info
+                div.panel-heading
+                    h3.panel-title users online
+                        span#usersOnlineCountLbl 1
+                div#messageContainer.panel-body
+                    div#messagesLbl
+                div.panel-footer
+                    div.input-group
+                        input#messageTxt.form-control(type="text", placeholder="enter message", maxlength=300)
+                        span.input-group-btn
+                            button#addMessageBtn.btn.btn-info send
+
+    script(src='javascripts/index.js')
+
+
+        //h2#nameLabel
     //
     //
     //input#moveXText(type=text)
@@ -12,17 +53,3 @@ block content
     //div#boardLabel
     //<br>
     //div#movesLabel
-
-    div#messagesLbl
-    input#messageTxt(type=text, class='form-control')
-    button#addMessageBtn(class='btn btn-default') add message
-
-
-    div#gameBoardLbl
-        div#noGamesLbl no games :(
-    button#createGameBtn(class='btn btn-primary') create game
-
-    div#gameFieldLbl board will be here
-    button#leaveGameBtn(class='btn', style='display:none') leave game
-
-    script(src='javascripts/index.js')

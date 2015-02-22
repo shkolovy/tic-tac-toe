@@ -1,8 +1,160 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: url(http://subtlepatterns.com/patterns/photography.png);
 }
 
-a {
-  color: #00B7FF;
+.content{
+  padding: 20px;
+}
+
+.navbar {
+  background: #1fa67a;
+  border: 1px solid #23a68c;
+  text-align: center;
+  padding: 10px 0 0 0;
+}
+
+.navbar .brand{
+  text-shadow: 3px 2px 0px #1d9d74, 2px 2px 0px rgba(0, 0, 0, 0.15);
+  color:#fff;
+font-weight: 300;
+font-size: 20px;
+}
+
+#chatContent .panel-body,
+#findGameContent .panel-body,
+#gameBoardLines{
+  height: 200px;
+  overflow: auto;
+}
+
+#addMessageBtn,
+#leaveGameBtn,
+#createGameBtn {
+  text-transform: uppercase;
+}
+
+.panel-title{
+  text-transform: capitalize;
+}
+
+#gameBoardLines button,
+#gameBoardLines .label-info{
+  float: right;
+}
+
+#gameBoardLines .label-info {
+  padding: 5px 5px;
+}
+
+.form-control:focus{
+  box-shadow:none;
+}
+
+.list-group-item:first-child {
+  border: 0;
+}
+
+
+
+.tic-tac-toe {
+  height: 450px;
+  width: 450px;
+  overflow: hidden;
+  margin: 50px auto 30px auto;
+  position: relative;
+}
+
+.tic-tac-toe label.left{
+  left: 0px;
+}
+
+.tic-tac-toe label.middle{
+  left: 150px;
+}
+
+.tic-tac-toe label.right{
+  left: 300px;
+}
+
+.tic-tac-toe label.top{
+  top: 0px;
+}
+
+.tic-tac-toe label.center{
+  top: 150px;
+}
+
+.tic-tac-toe label.bottom{
+  top: 300px;
+}
+
+.tic-tac-toe label {
+  height: 140px;
+  width: 140px;
+  display: block;
+}
+
+.tic-tac-toe label:hover {
+  background-color: #3d4250;
+
+}
+
+.tic-tac-toe label:hover:after {
+  opacity: .4;
+}
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('../fonts/fontawesome-webfont.eot?v=4.3.0');
+  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.3.0') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.3.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.3.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.3.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.3.0#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.tic-tac-toe .cross + label:after{
+  content: "";
+}
+
+.tic-tac-toe .zero + label:after {
+  content: "";
+}
+
+.tic-tac-toe .cross.checked + label {
+  background-color: #dc685a;
+}
+
+.tic-tac-toe .zero.checked + label {
+  background-color: #ecaf4f;
+}
+
+.tic-tac-toe label:after {
+  left: 0;
+  font-family: "FontAwesome";
+  opacity: 0;
+  position: absolute;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  top: 50%;
+  width: 100%;
+  font-size: 70px;
+  margin-top: -35px;
+}
+
+.tic-tac-toe .checked + label:after {
+  opacity: 1;
+  cursor: default;
+}
+
+.tic-tac-toe label {
+  background-color: #78bec5;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #fff;
+  margin: 5px;
+  position: absolute;
+  -moz-transition: background-color 0.3s;
+  -o-transition: background-color 0.3s;
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
 }
