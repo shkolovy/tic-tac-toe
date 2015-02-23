@@ -49,7 +49,7 @@ $(function(){
         $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:cadetblue">' +
                             (data.user.id === socket.id ? 'you' : data.user.name) + '</span>: ' + data.message + '</div>');
 
-        $messageContainer.animate({ scrollTop: $messagesLbl.height() }, 'slow');
+        $messageContainer.animate({ scrollTop: $messagesLbl.height() }, 400);
     });
 
     socket.on('showNewGame', function(id){
@@ -171,7 +171,7 @@ $(function(){
 
     userName = prompt("Please enter your name", userName);
 
-    $userNameLbl.text('Hola ' + userName);
+    $userNameLbl.text(', ' + userName + '!');
     socket.emit('newUser', userName);
     $content.fadeIn(900);
 });

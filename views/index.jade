@@ -1,7 +1,6 @@
 extends layout
 
 block content
-    h3#userNameLbl
     div.row
         div#gameContent.col-md-6
             div#findGameContent
@@ -11,10 +10,19 @@ block content
                             span#gamesCountLbl.badge.right(title='active games', data-toggle='tooltip') 1
                     div#noGamesLbl.panel-body(style='display:none') no active games :(
                     ul#gameBoardLines.list-group
-                button#createGameBtn.btn.btn-info
-                    span.glyphicon.glyphicon-triangle-right
-                    |create new game
+                button#createGameBtn.btn.btn-warning
+                    span.glyphicon.glyphicon-chevron-right
+                    |&nbsp;create new game
             div#gameAreaContent(style='display:none')
+                table#gameTitleTable
+                    tr
+                        td Artem
+                        td Vs
+                        td Petro
+                    tr
+                        td.cup 33
+                        td
+                        td.cup 12
                 div#gameFieldLbl.tic-tac-toe
                     label.left.top
                     label.middle.top.cross
@@ -25,9 +33,9 @@ block content
                     label.left.bottom
                     label.middle.bottom
                     label.right.bottom
-                button#leaveGameBtn.btn.btn-info
-                    span.glyphicon.glyphicon-triangle-left
-                    |leave game
+                    button#leaveGameBtn.btn.btn-info
+                        span.glyphicon.glyphicon-chevron-left
+                        |leave game
         div#chatContent.col-md-6
             div.panel.panel-info
                 div.panel-heading
