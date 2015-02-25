@@ -198,6 +198,19 @@ footer .love{
   transition: background-color 0.3s;
 }
 
+#overlay{
+  background: rgba(255, 255, 255, 0.8);
+  bottom: 65px;
+  /*display: none;*/
+  left: 5px;
+  padding-top: 55px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  text-align: center;
+  z-index: 11;
+}
+
 #gameTitleTable {
   width: 450px;
   margin: 0px auto 0px auto;
@@ -217,4 +230,18 @@ footer .love{
   min-width: 64px;
   background: url('../images/cup_64.png') no-repeat center;
   padding-top: 6px;
+}
+
+.cup span{
+  color:#fff;
+  text-shadow: 2px 1px 0px #ecaf4f, 2px 2px 0px #ccc;
+}
+
+#playAgainBtn {
+  background: #333;
+  color: #fff;
+}
+
+#playAgainBtn:hover {
+  background: #444;
 }

@@ -30,7 +30,14 @@ $(function(){
     socket.on('userLeft', function(data){
         console.log('user left ' + data.userName);
 
-        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:cadetblue">' + data.userName + '</span> has left</div>');
+
+        //console.log(jade.renderFile('../../views/test.jade')({
+        //    userName: data.userName,
+        //    formattedTime: getFormattedTime(data.time),
+        //    message: 'has left'
+        //}))
+
+        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:#d9534f">' + data.userName + '</span> has left</div>');
     });
 
     socket.on('userJoined', function(data){
@@ -40,13 +47,13 @@ $(function(){
             $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> Welcome to chat ;)</div>');
         }
         else{
-            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:cadetblue">' + data.user.name + '</span> has joined</div>');
+            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:' + data.user.color + '">' + data.user.name + '</span> has joined</div>');
         }
     });
 
     socket.on('showMessage', function(data){
         console.log('message from ' + (data.user.id === socket.id ? 'you' : data.user.name) + ': ' + data.message);
-        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:cadetblue">' +
+        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:' + data.user.color + '">' +
                             (data.user.id === socket.id ? 'you' : data.user.name) + '</span>: ' + data.message + '</div>');
 
         $messageContainer.animate({ scrollTop: $messagesLbl.height() }, 400);
@@ -55,9 +62,7 @@ $(function(){
     socket.on('showNewGame', function(id){
         console.log('show new game ' + id);
 
-        $findGameContent.hide();
-        $gameAreaContent.show();
-        //$gameFieldLbl.text('game #' + id);
+        showGame();
     });
 
     socket.on('updateGameBoardLine', function(data){
@@ -77,6 +82,8 @@ $(function(){
         $noGamesLbl.toggle(data.gamesCount === 0);
         $gameBoardLines.toggle(data.gamesCount > 0);
 
+        console.log(data.templates);
+
         for (var property in data.games) {
             $gameBoardLines.append(buildGameBoardLine(data.games[property]));
         }
@@ -85,8 +92,7 @@ $(function(){
     socket.on('serverUserLeft', function(){
         console.log('server User Left');
 
-        $findGameContent.show();
-        $gameAreaContent.hide();
+        hideGame();
     });
 
     function getFormattedTime(timeStr){
@@ -113,8 +119,8 @@ $(function(){
     }
 
     function buildGameBoardLine(game){
-        return '<li class="list-group-item" data-game-id="' + game.id + '">' + game.user1.name + ' <span class="text-muted">vs</span> ' +
-            (game.user2 ? game.user2.name : '-') +
+        return '<li class="list-group-item" data-game-id="' + game.id + '"><span style="color:' + game.user1.color + '">' + game.user1.name + '</span> <span class="text-muted">vs</span> ' +
+            (game.user2 ? '<span style="color:' + game.user2.color + '">' + game.user2.name + '</span>' : '-') +
             (game.user2 ? '<span class="label label-info">'+ game.score1 + ' : ' + game.score2 +'</span>' :
             (game.user1.id === socket.id ? '' : '<button class="btn btn-default btn-xs">join</button>')) +
             '</li>';
@@ -137,8 +143,7 @@ $(function(){
     function leaveGame(){
         socket.emit('leaveGame');
 
-        $findGameContent.show();
-        $gameAreaContent.hide();
+        hideGame();
     }
 
     function joinGame(){
@@ -148,8 +153,19 @@ $(function(){
             gameId: gameToJoinId
         });
 
-        $findGameContent.hide();
-        $gameAreaContent.show();
+        showGame();
+    }
+
+    function showGame(){
+        $findGameContent.fadeOut(400, function(){
+            $gameAreaContent.show();
+        });
+    }
+
+    function hideGame(){
+        $gameAreaContent.fadeOut(400, function(){
+            $findGameContent.show();
+        });
     }
 
     function addMessageOnEnterClick(e) {
@@ -281,6 +297,4 @@ $(function(){
 //
 //    $(init);
 //}());
-
-
 

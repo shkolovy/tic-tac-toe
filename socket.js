@@ -9,7 +9,13 @@ module.exports = function(server){
         boards = {},
         games = {},
         gamesCount = 0,
-        userCount = 0;
+        userCount = 0,
+        colors = [
+            '#428bca',
+            '#5cb85c',
+            '#5bc0de',
+            '#f0ad4e'
+        ];
 
     io.on('connection', onConnection);
 
@@ -36,7 +42,8 @@ module.exports = function(server){
             socket.userName = userName;
             users[socket.id] = {
                 id: socket.id,
-                name: userName
+                name: userName,
+                color: colors[Math.floor((Math.random() * 4))]
             };
 
             io.emit('userJoined', {
