@@ -16,16 +16,16 @@ block content
             div#gameAreaContent(style='display:none')
                 table#gameTitleTable
                     tr
-                        td#user1Name
+                        td#user1NameLbl
                         td
                             span.text-muted Vs
-                        td#user2Name
+                        td#user2NameLbl
                     tr
                         td.cup
-                            span#user1Score
+                            span#user1ScoreLbl
                         td
                         td.cup
-                            span#user2Score
+                            span#user2ScoreLbl
                 div#gameFieldLbl.tic-tac-toe
                     label.left.top
                     label.middle.top.cross
@@ -36,11 +36,9 @@ block content
                     label.left.bottom
                     label.middle.bottom
                     label.right.bottom
-                    div#overlay
-                        div#playAgainLbl
-                            div#gameResultLbl you won
-                            button#playAgainBtn.btn play again
-                        div#userLeftLbl user has left
+                    div#gameOverlay(style='display:none')
+                        div#gameInfoLbl
+                        button#playAgainBtn.btn(style='display:none') play again
                     button#leaveGameBtn.btn.btn-info
                         span.glyphicon.glyphicon-chevron-left
                         |leave game

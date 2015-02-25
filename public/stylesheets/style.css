@@ -198,7 +198,7 @@ footer .love{
   transition: background-color 0.3s;
 }
 
-#overlay{
+#gameOverlay{
   background: rgba(255, 255, 255, 0.8);
   bottom: 65px;
   /*display: none;*/
@@ -244,4 +244,11 @@ footer .love{
 
 #playAgainBtn:hover {
   background: #444;
+}
+
+.ui-pnotify.custom .alert-warning{
+  background: #000;
+  color:#fff;
+  border: 0;
+  cursor: pointer;
 }

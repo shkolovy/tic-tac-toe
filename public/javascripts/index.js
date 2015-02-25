@@ -5,6 +5,7 @@
 $(function(){
     var socket = io.connect(),
         userName = 'none',
+        notificationStack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25},
 
         $content = $('#content'),
         $userNameLbl = $('#userNameLbl'),
@@ -21,7 +22,14 @@ $(function(){
         $leaveGameBtn = $('#leaveGameBtn'),
         $noGamesLbl = $('#noGamesLbl'),
         $gamesCountLbl = $('#gamesCountLbl'),
-        $gameBoardLines = $('#gameBoardLines');
+        $gameBoardLines = $('#gameBoardLines'),
+        $user1NameLbl = $('#user1NameLbl'),
+        $user2NameLbl = $('#user2NameLbl'),
+        $user1ScoreLbl = $('#user1ScoreLbl'),
+        $user2ScoreLbl = $('#user2ScoreLbl'),
+        $gameInfoLbl = $('#gameInfoLbl'),
+        $playAgainBtn = $('#playAgainBtn'),
+        $gameOverlay = $('#gameOverlay');
 
     socket.on('updateUsersCount', function(count){
         $usersOnlineCountLbl.text(count);
@@ -30,14 +38,8 @@ $(function(){
     socket.on('userLeft', function(data){
         console.log('user left ' + data.userName);
 
-
-        //console.log(jade.renderFile('../../views/test.jade')({
-        //    userName: data.userName,
-        //    formattedTime: getFormattedTime(data.time),
-        //    message: 'has left'
-        //}))
-
-        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:#d9534f">' + data.userName + '</span> has left</div>');
+        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) +
+        ']</span> <span style="color:#d9534f">' + data.userName + '</span> has left</div>');
     });
 
     socket.on('userJoined', function(data){
@@ -47,7 +49,8 @@ $(function(){
             $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> Welcome to chat ;)</div>');
         }
         else{
-            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:' + data.user.color + '">' + data.user.name + '</span> has joined</div>');
+            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:'
+            + data.user.color + '">' + data.user.name + '</span> has joined</div>');
         }
     });
 
@@ -61,7 +64,8 @@ $(function(){
 
     socket.on('showNewGame', function(id){
         console.log('show new game ' + id);
-
+        $gameOverlay.show();
+        $gameInfoLbl.text('waiting for an opponent');
         showGame();
     });
 
@@ -89,11 +93,59 @@ $(function(){
         }
     });
 
-    socket.on('serverUserLeft', function(){
+    socket.on('serverUserLeftGame', function(user){
         console.log('server User Left');
 
         hideGame();
     });
+
+    socket.on('updateGameResult', function(game){
+        console.log('update game result');
+
+        $user1NameLbl.text(game.user1.name).css('color', game.user1.color);
+        $user1ScoreLbl.text(game.score1);
+
+        if(game.user2){
+            $user2NameLbl.text(game.user2.name).css('color', game.user2.color);
+            $user2ScoreLbl.text(game.score2);
+        }
+        else{
+            $user2NameLbl.text('-').css('color', '');
+            $user2ScoreLbl.text('-');
+        }
+    });
+
+    socket.on('userJoinGame', function(user){
+        console.log('userJoinGame ' + user.name);
+        showNotification('user ' + user.name + 'joined the game');
+    });
+
+    socket.on('userLeftGame', function(user){
+        console.log('userLeftGame ' + user.name);
+        showNotification('user ' + user.name + 'left the game');
+    });
+
+    function showNotification(text){
+        var n = new PNotify({
+            text: text,
+            shadow: false,
+            icon: false,
+            opacity: .8,
+            addclass: 'stack-bottomright custom',
+            stack: notificationStack,
+            animate_speed: 400,
+            animation: {
+                'effect_in': 'drop',
+                'options_in': 'linear',
+                'effect_out': 'drop',
+                'options_out': 'linear'
+            }
+        });
+
+        n.get().click(function() {
+            n.remove();
+        });
+    }
 
     function getFormattedTime(timeStr){
         var date = new Date(timeStr);
