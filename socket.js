@@ -84,7 +84,7 @@ module.exports = function(server){
 
             users[socket.id].gameId = id;
 
-            io.to(socket.id).emit('showNewGame', id);
+            io.to(socket.id).emit('showNewGame', games[id]);
 
             io.to(socket.id).emit('updateGameResult', games[id]);
 
@@ -105,8 +105,10 @@ module.exports = function(server){
             game.user2 = users[socket.id];
 
             users[socket.id].gameId = game.id;
+            users[socket.id].opponentId = game.user1.id;
+            users[game.user1.id].opponentId = socket.id;
 
-            io.to(socket.id).emit('showNewGame', game.id);
+            io.to(socket.id).emit('showNewGame', game);
 
             socket.join('gameRoom' + data.gameId);
 
@@ -124,28 +126,52 @@ module.exports = function(server){
             var gameToLeaveId = users[socket.id].gameId,
                 gameToLeave = games[gameToLeaveId];
 
-            if(gameToLeave.user1 && gameToLeave.user1.id === socket.id){
-                gameToLeave.isRemoved = true;
-                delete games[gameToLeaveId];
+            if(gameToLeave){
+                if(gameToLeave.user1 && gameToLeave.user1.id === socket.id){
+                    gameToLeave.isRemoved = true;
+                    delete games[gameToLeaveId];
 
-                gamesCount--;
+                    gamesCount--;
 
-                if(gameToLeave.user2){
-                    io.to(gameToLeave.user2.id).emit('serverUserLeftGame');
+                    if(gameToLeave.user2){
+                        io.to(gameToLeave.user2.id).emit('serverUserLeftGame');
+                    }
                 }
+                else if(gameToLeave.user2 && gameToLeave.user2.id === socket.id){
+                    var user2 = gameToLeave.user2;
+                    gameToLeave.user2 = undefined;
+                    io.to('gameRoom' + gameToLeave.id).emit('updateGameResult', gameToLeave);
+                    io.to(gameToLeave.user1.id).emit('userLeftGame', user2);
+                }
+
+                io.emit('updateGameBoardLine', {
+                    game: gameToLeave,
+                    gamesCount: gamesCount
+                });
             }
-            else if(gameToLeave.user2 && gameToLeave.user2.id === socket.id){
-                var user2 = gameToLeave.user2;
-                gameToLeave.user2 = undefined;
-                io.to('gameRoom' + gameToLeave.id).emit('updateGameResult', gameToLeave);
-                io.to(gameToLeave.user1.id).emit('userLeftGame', user2);
+        });
+
+        socket.on('move', function (move) {
+            var user = users[socket.id],
+                game = games[user.gameId],
+                opponent = users[user.opponentId];
+
+            if(move.x === 7){
+                io.to('gameRoom' + game.id).emit('showMatchResult', {
+                    isDraw: false,
+                    winner: user
+                });
+            }
+            else if(move.x === 6){
+                io.to('gameRoom' + game.id).emit('showMatchResult', {
+                    isDraw: true
+                });
             }
 
-            io.emit('updateGameBoardLine', {
-                game: gameToLeave,
-                gamesCount: gamesCount
-            });
+            io.to(opponent.id).emit('showMove', move);
         });
+
+
     }
 
     return io;

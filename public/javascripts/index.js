@@ -62,10 +62,17 @@ $(function(){
         $messageContainer.animate({ scrollTop: $messagesLbl.height() }, 400);
     });
 
-    socket.on('showNewGame', function(id){
-        console.log('show new game ' + id);
-        $gameOverlay.show();
-        $gameInfoLbl.text('waiting for an opponent');
+    socket.on('showNewGame', function(game){
+        console.log('show new game ' + game.id);
+
+        if(!game.user2){
+            $gameOverlay.show();
+            $gameInfoLbl.text('waiting for an opponent');
+        }
+        else{
+            $gameOverlay.hide();
+        }
+
         showGame();
     });
 
@@ -95,8 +102,9 @@ $(function(){
 
     socket.on('serverUserLeftGame', function(user){
         console.log('server User Left');
-
-        hideGame();
+        $gameOverlay.show();
+        $gameInfoLbl.text('server left the game, leave the game');
+        //hideGame();
     });
 
     socket.on('updateGameResult', function(game){
@@ -118,12 +126,37 @@ $(function(){
     socket.on('userJoinGame', function(user){
         console.log('userJoinGame ' + user.name);
         showNotification('user ' + user.name + 'joined the game');
+        $gameOverlay.hide();
     });
 
     socket.on('userLeftGame', function(user){
         console.log('userLeftGame ' + user.name);
         showNotification('user ' + user.name + 'left the game');
+        $gameInfoLbl.text('user left the game, waiting for another');
+        $gameOverlay.show();
     });
+
+    socket.on('showMove', function(move) {
+        console.log('opponent moved ' + move.x + ':' + move.y);
+    });
+
+    socket.on('showMatchResult', function(data) {
+        console.log('match result ' + (data.isDraw ? 'tie' : data.winner.name));
+
+        if(data.isDraw){
+            $gameInfoLbl.text('tie');
+        }
+        else{
+            $gameInfoLbl.text(data.winner.id === socket.id ? 'you won' : 'you lost');
+        }
+
+        $playAgainBtn.show();
+        $gameOverlay.show();
+    });
+
+    function playAgain(){
+        console.log('play again');
+    }
 
     function showNotification(text){
         var n = new PNotify({
@@ -228,6 +261,14 @@ $(function(){
                 return false;
             }
         }
+    }
+
+
+    move = function(move){
+        socket.emit('move', {
+            x: move.x,
+            y: move.y
+        });
     }
 
     $addMessageBtn.on('click', addMessage);
