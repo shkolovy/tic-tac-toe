@@ -122,6 +122,28 @@ $(function(){
             $user2NameLbl.text('-').css('color', '');
             $user2ScoreLbl.text('-');
         }
+
+        //if(game.user1.id === socket.id){
+        //    $user1NameLbl.text('you').css('color', game.user1.color);
+        //    $user1ScoreLbl.text(game.score1);
+        //
+        //    if(game.user2){
+        //        $user2NameLbl.text(game.user2.name).css('color', game.user2.color);
+        //        $user2ScoreLbl.text(game.score2);
+        //    }
+        //    else{
+        //        $user2NameLbl.text('-').css('color', '');
+        //        $user2ScoreLbl.text('-');
+        //    }
+        //}
+        //else {
+        //    $user1NameLbl.text('you').css('color', game.user2.color);
+        //    $user1ScoreLbl.text(game.score2);
+        //
+        //    $user2NameLbl.text(game.user1.name).css('color', game.user1.color);
+        //    $user2ScoreLbl.text(game.score1);
+        //}
+
     });
 
     socket.on('userJoinGame', function(user){
