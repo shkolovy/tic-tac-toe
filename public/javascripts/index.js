@@ -104,6 +104,7 @@ $(function(){
         console.log('server User Left');
         $gameOverlay.show();
         $gameInfoLbl.text('server left the game, leave the game');
+        showNotification('user ' + user.name + 'left the game');
         //hideGame();
     });
 

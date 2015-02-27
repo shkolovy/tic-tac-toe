@@ -12,6 +12,7 @@ body {
 }
 
 footer{
+  position: relative;
   text-align: center;
   color:#31b0d5;
   font-size: 0.8em;
@@ -28,6 +29,14 @@ footer a:hover{
 footer .love{
   color: #d9534f;
 }
+
+footer .alpha{
+  color: #333;
+  bottom: 20px;
+  right: 0px;
+  position: absolute;
+}
+
 .panel-info{
   border-color: #31b0d5;
 }
@@ -217,12 +226,13 @@ footer .love{
 }
 
 #gameTitleTable tr:first-child{
-  font-size: 2em;
+  font-size: 1.8em;
 }
 
 #gameTitleTable td{
   vertical-align: top;
   text-align: center;
+  padding-bottom: 5px;
 }
 
 .cup{
