@@ -3,9 +3,22 @@
  */
 
 $(function(){
-    var socket = io.connect(),
+    var ANIMATION_SPEED = 400,
+        ENTER_KEY = 13,
+        CROSS_CSS = 'cross',
+        ZERO_CSS = 'zero',
+        CHECKED_CSS = 'checked',
+        CROSS_TURN_CSS = 'cross-turn',
+        ZERO_TURN_CSS = 'zero-turn',
+
+        socket = io.connect(),
+
         userName = 'none',
-        notificationStack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25},
+        isYourTurn = false,
+        isUser1 = false,
+        isCross = false,
+
+        notificationStack = { "dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25 },
 
         $content = $('#content'),
         $userNameLbl = $('#userNameLbl'),
@@ -18,7 +31,6 @@ $(function(){
         $addMessageBtn = $('#addMessageBtn'),
         $createGameBtn = $('#createGameBtn'),
         $gameFieldLbl = $('#gameFieldLbl'),
-        //$gameBoardLbl = $('#gameBoardLbl'),
         $leaveGameBtn = $('#leaveGameBtn'),
         $noGamesLbl = $('#noGamesLbl'),
         $gamesCountLbl = $('#gamesCountLbl'),
@@ -29,8 +41,12 @@ $(function(){
         $user2ScoreLbl = $('#user2ScoreLbl'),
         $gameInfoLbl = $('#gameInfoLbl'),
         $playAgainBtn = $('#playAgainBtn'),
-        $gameOverlay = $('#gameOverlay');
+        $user1Container = $('#user1Container'),
+        $user2Container = $('#user2Container'),
+        $gameFieldOverlay = $('#gameFieldOverlay'),
+        $gameFieldBlockTurnOverlay = $('#gameFieldBlockTurnOverlay');
 
+    //events
     socket.on('updateUsersCount', function(count){
         $usersOnlineCountLbl.text(count);
     });
@@ -62,20 +78,6 @@ $(function(){
         $messageContainer.animate({ scrollTop: $messagesLbl.height() }, 400);
     });
 
-    socket.on('showNewGame', function(game){
-        console.log('show new game ' + game.id);
-
-        if(!game.user2){
-            $gameOverlay.show();
-            $gameInfoLbl.text('waiting for an opponent');
-        }
-        else{
-            $gameOverlay.hide();
-        }
-
-        showGame();
-    });
-
     socket.on('updateGameBoardLine', function(data){
         console.log('update Game Board ' + data.game.id);
 
@@ -102,10 +104,9 @@ $(function(){
 
     socket.on('serverUserLeftGame', function(user){
         console.log('server User Left');
-        $gameOverlay.show();
+        $gameFieldOverlay.show();
         $gameInfoLbl.text('server left the game, leave the game');
         showNotification('user ' + user.name + 'left the game');
-        //hideGame();
     });
 
     socket.on('updateGameResult', function(game){
@@ -148,19 +149,29 @@ $(function(){
 
     socket.on('userJoinGame', function(user){
         console.log('userJoinGame ' + user.name);
+
         showNotification('user ' + user.name + 'joined the game');
-        $gameOverlay.hide();
+        $gameFieldOverlay.hide();
+        $gameFieldBlockTurnOverlay.show();
     });
 
     socket.on('userLeftGame', function(user){
         console.log('userLeftGame ' + user.name);
+
         showNotification('user ' + user.name + 'left the game');
         $gameInfoLbl.text('user left the game, waiting for another');
-        $gameOverlay.show();
+        $gameFieldOverlay.show();
     });
 
-    socket.on('showMove', function(move) {
+    socket.on('showOpponentMove', function(move) {
         console.log('opponent moved ' + move.x + ':' + move.y);
+
+        isYourTurn = true;
+
+        $gameFieldLbl.find('label[data-x=' + move.x + '][data-y=' + move.y + ']')
+                    .addClass(CHECKED_CSS).addClass(isCross ? ZERO_CSS : CROSS_CSS);
+
+        showWhoseTurn();
     });
 
     socket.on('showMatchResult', function(data) {
@@ -174,7 +185,7 @@ $(function(){
         }
 
         $playAgainBtn.show();
-        $gameOverlay.show();
+        $gameFieldOverlay.show();
     });
 
     function playAgain(){
@@ -189,7 +200,7 @@ $(function(){
             opacity: .8,
             addclass: 'stack-bottomright custom',
             stack: notificationStack,
-            animate_speed: 400,
+            animate_speed: ANIMATION_SPEED,
             animation: {
                 'effect_in': 'drop',
                 'options_in': 'linear',
@@ -244,14 +255,22 @@ $(function(){
     }
 
     function createNewGame(){
-        //$createGameBtn.prop('disabled', true);
         socket.emit('newGame');
+
+        isCross = false;
+        isUser1 = true;
+
+        $gameFieldOverlay.show();
+        $gameInfoLbl.text('waiting for an opponent');
+
+        initGameField();
+        showGameField();
     }
 
     function leaveGame(){
         socket.emit('leaveGame');
 
-        hideGame();
+        hideGameField();
     }
 
     function joinGame(){
@@ -261,24 +280,18 @@ $(function(){
             gameId: gameToJoinId
         });
 
-        showGame();
-    }
+        isUser1 = false;
+        isYourTurn = true;
+        isCross = true;
 
-    function showGame(){
-        $findGameContent.fadeOut(400, function(){
-            $gameAreaContent.show();
-        });
-    }
-
-    function hideGame(){
-        $gameAreaContent.fadeOut(400, function(){
-            $findGameContent.show();
-        });
+        initGameField();
+        showGameField();
     }
 
     function addMessageOnEnterClick(e) {
         var key = e.which;
-        if(key == 13){
+
+        if(key == ENTER_KEY){
             if($(this).val().length > 0){
                 $addMessageBtn.click();
                 return false;
@@ -286,131 +299,65 @@ $(function(){
         }
     }
 
+    function move(){
+        var $el = $(this);
 
-    move = function(move){
+        if($el.hasClass('checked')){
+            return;
+        }
+
+        isYourTurn = false;
+
         socket.emit('move', {
-            x: move.x,
-            y: move.y
+            x: $el.data('x'),
+            y: $el.data('y')
+        });
+
+        $(this).addClass(CHECKED_CSS).addClass(isCross ? CROSS_CSS : ZERO_CSS);
+
+        showWhoseTurn();
+    }
+
+    //helper functions
+    function showWhoseTurn(){
+        $user1Container.find('.move-pointer').fadeToggle(isUser1 && isYourTurn);
+        $user2Container.find('.move-pointer').fadeToggle(isUser1 && !isYourTurn);
+        $gameFieldBlockTurnOverlay.toggle(!isYourTurn);
+    }
+
+    function initGameField(){
+        $gameFieldLbl.toggleClass(ZERO_TURN_CSS, !isCross).toggleClass(CROSS_TURN_CSS, isCross);
+    }
+
+    function showGameField(){
+        $findGameContent.fadeOut(ANIMATION_SPEED, function(){
+            $gameAreaContent.show();
         });
     }
 
+    function hideGameField(){
+        $gameAreaContent.fadeOut(ANIMATION_SPEED, function(){
+            $findGameContent.show();
+        });
+    }
+
+    function clearGameArena(){
+        $gameFieldLbl.find('label').removeClass(CROSS_CSS).removeClass(ZERO_CSS);
+    }
+
+    //init ui controls
     $addMessageBtn.on('click', addMessage);
     $createGameBtn.on('click', createNewGame);
-    $gameBoardLines.on('click', 'button', joinGame);
     $leaveGameBtn.on('click', leaveGame);
     $messageTxt.on('keypress', addMessageOnEnterClick);
+    $gameBoardLines.on('click', 'button', joinGame);
+    $gameFieldLbl.on('click', 'label', move);
+
     $('[data-toggle="tooltip"]').tooltip();
 
     userName = prompt("Please enter your name", userName);
 
     $userNameLbl.text(', ' + userName + '!');
     socket.emit('newUser', userName);
-    $content.fadeIn(900);
+    $content.fadeIn(ANIMATION_SPEED);
 });
-
-
-
-//function askForName(){
-//    userName = prompt("Please enter your name", userName);
-//};
-//
-//socket.on('my message', function(data){
-//    console.log(data);
-//});
-//
-//socket.on('noAvailableSlots', function(data){
-//    console.log('noAvailableSlots');
-//});
-//
-//socket.on('waitingForAnotherUser', function(data){
-//    console.log('waitingForAnotherUser');
-//});
-//
-//socket.on('readyToStart', function(data){
-//    console.log('readyToStart');
-//    askForName();
-//});
-
-
-
-
-//(function(){
-//    var socket = io.connect(),
-//        //board = new Board(),
-//        $moveBtn = $('#moveBtn'),
-//        $moveXText = $('#moveXText'),
-//        $moveYText = $('#moveYText'),
-//        $movesLabel = $('#movesLabel'),
-//        $boardLabel = $('#boardLabel'),
-//        $nameLabel = $('#nameLabel');
-//
-//    var userName = 'none';
-//
-//    function init(){
-//        socket.on('show', onShow);
-//        socket.on('occupied', onOccupied);
-//        socket.on('winner', onVictory);
-//        socket.on('draw', onDraw);
-//        socket.on('waitForUser', waitForUser);
-//
-//        $moveBtn.on('click', onMoveClick);
-//        askForName();
-//        $nameLabel.text(userName);
-//    };
-//
-//    function askForName(){
-//        userName = prompt("Please enter your name", userName);
-//    };
-//
-//    function onMoveClick() {
-//        var m = {
-//                x: Number($moveXText.val()),
-//                y: Number($moveYText.val())
-//            };
-//
-//        move(m);
-//    }
-//
-//    //events
-//    function waitForUser(){
-//        alert('wait for users');
-//    };
-//
-//    function onOccupied(){
-//        alert('occupied');
-//    };
-//
-//    function onVictory(){
-//        alert(userName + ' wins!');
-//    };
-//
-//    function onDraw(){
-//        alert('draw!');
-//    };
-//
-//    function onShow(data){
-//        $movesLabel.append('<p>user: ' + data.user + '</br>move: x:' + data.move.x + ', y:' + data.move.y + '</p>');
-//
-//        $boardLabel.html('');
-//
-//        console.log(data.board);
-//
-//        for(var i = 0; i < 3; i++){
-//            for(var j = 0; j < 3; j++){
-//                $boardLabel.append(data.board[i][j] === null ? '-' : (data.board[i][j] === 1 ? 'x' : 'o'));
-//            }
-//
-//            $boardLabel.append('<br>');
-//        }
-//    };
-//
-//    function move(move){
-//        socket.emit('move', {
-//                user: userName,
-//                move: move
-//            });
-//    };
-//
-//    $(init);
-//}());
-

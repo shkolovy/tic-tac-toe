@@ -194,3 +194,23 @@ footer .alpha{
   border: 0;
   cursor: pointer;
 }
+
+/*.move-pointer-container{*/
+  /*height: 13px;*/
+  /*width: 13px;*/
+  /*text-align: center;*/
+/*}*/
+
+#user1Container,
+#user2Container{
+  width: 42%;
+  position: relative;
+}
+
+.move-pointer{
+  color: #777;
+  position: absolute;
+  left: 47%;
+  top: -5px;
+  font-size: 0.5em;
+}

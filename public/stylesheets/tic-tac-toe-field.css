@@ -38,6 +38,7 @@
     margin-top: -45px;
 }
 
+.tic-tac-toe label.checked,
 .tic-tac-toe label.checked:after {
     opacity: 1;
     cursor: default;
@@ -56,15 +57,22 @@
     transition: background-color 0.3s;
 }
 
-#gameOverlay{
-    background: rgba(255, 255, 255, 0.8);
+#gameFieldBlockTurnOverlay,
+#gameFieldOverlay {
     bottom: 65px;
-    /*display: none;*/
     left: 5px;
     padding-top: 55px;
     position: absolute;
     right: 5px;
     top: 5px;
-    text-align: center;
     z-index: 11;
+}
+
+#gameFieldBlockTurnOverlay{
+
+}
+
+#gameFieldOverlay{
+    background: rgba(255, 255, 255, 0.8);
+    text-align: center;
 }

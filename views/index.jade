@@ -16,9 +16,13 @@ block content
             div#gameAreaContent(style='display:none')
                 table#gameTitleTable
                     tr
-                        td#user1NameLbl(style="width:42%")
+                        td#user1Container
+                            i.move-pointer.glyphicon.glyphicon-triangle-bottom(style='display:none')
+                            div#user1NameLbl
                         td.text-muted vs
-                        td#user2NameLbl(style="width:42%")
+                        td#user2Container
+                            i.move-pointer.glyphicon.glyphicon-triangle-bottom
+                            div#user2NameLbl
                     tr
                         td.cup
                             span#user1ScoreLbl
@@ -26,16 +30,17 @@ block content
                         td.cup
                             span#user2ScoreLbl
                 div#gameFieldLbl.tic-tac-toe.cross-turn
-                    label.left.top
-                    label.middle.top
-                    label.right.top
-                    label.left.center.cross.checked
-                    label.middle.center.zero.checked
-                    label.right.center
-                    label.left.bottom
-                    label.middle.bottom
-                    label.right.bottom
-                    div#gameOverlay(style='display:none')
+                    label.left.top(data-x='0', data-y='0')
+                    label.middle.top(data-x='0', data-y='1')
+                    label.right.top(data-x='0', data-y='2')
+                    label.left.center.cross.checked(data-x='1', data-y='0')
+                    label.middle.center.zero.checked(data-x='1', data-y='1')
+                    label.right.center(data-x='1', data-y='2')
+                    label.left.bottom(data-x='2', data-y='0')
+                    label.middle.bottom(data-x='2', data-y='1')
+                    label.right.bottom(data-x='2', data-y='2')
+                    div#gameFieldBlockTurnOverlay(style='display:none')
+                    div#gameFieldOverlay(style='display:none')
                         div#gameInfoLbl
                         button#playAgainBtn.btn(style='display:none') play again
                     button#leaveGameBtn.btn.btn-info
@@ -53,20 +58,3 @@ block content
                         input#messageTxt.form-control(type="text", placeholder="enter message", maxlength=300)
                         span.input-group-btn
                             button#addMessageBtn.btn.btn-info send
-
-
-    script(type='template', id='userMessageTemplate').
-        div
-            span.text-muted [ #{title} ]
-            span(style="color:cadetblue") #{userName}
-            |#{message}
-
-    //
-    //
-    //input#moveXText(type=text)
-    //input#moveYText(type=text)
-    //button#moveBtn move
-    //<br>
-    //div#boardLabel
-    //<br>
-    //div#movesLabel

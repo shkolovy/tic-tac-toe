@@ -85,7 +85,7 @@ module.exports = function(server){
 
             users[socket.id].gameId = id;
 
-            io.to(socket.id).emit('showNewGame', games[id]);
+            //io.to(socket.id).emit('showNewGame', games[id]);
 
             io.to(socket.id).emit('updateGameResult', games[id]);
 
@@ -144,7 +144,7 @@ module.exports = function(server){
                 });
             }
 
-            io.to(opponent.id).emit('showMove', move);
+            io.to(opponent.id).emit('showOpponentMove', move);
         });
 
         function leaveGame(){
