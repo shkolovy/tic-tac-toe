@@ -1,3 +1,48 @@
+.tic-tac-toe {
+    height: 450px;
+    width: 390px;
+    overflow: hidden;
+    margin: 0px auto 10px auto;
+    position: relative;
+}
+
+.tic-tac-toe label.left {
+    left: 0px;
+}
+
+.tic-tac-toe label.middle {
+    left: 130px;
+}
+
+.tic-tac-toe label.right {
+    left: 260px;
+}
+
+.tic-tac-toe label.top {
+    top: 0px;
+}
+
+.tic-tac-toe label.center {
+    top: 130px;
+}
+
+.tic-tac-toe label.bottom {
+    top: 260px;
+}
+
+.tic-tac-toe label {
+    height: 120px;
+    width: 120px;
+    display: block;
+}
+
+.tic-tac-toe label:hover {
+    background-color: #31b0d5;
+}
+
+.tic-tac-toe label:hover:after {
+    opacity: .4;
+}
 
 @font-face {
     font-family: 'FontAwesome';
@@ -8,7 +53,7 @@
 }
 
 .tic-tac-toe.cross-turn label:not(.zero):hover:after,
-.tic-tac-toe label.cross:after{
+.tic-tac-toe label.cross:after {
     content: "";
 }
 
@@ -21,7 +66,7 @@
     background-color: #dc685a;
 }
 
-.tic-tac-toe label.zero.checked  {
+.tic-tac-toe label.zero.checked {
     background-color: #ecaf4f;
 }
 
@@ -68,11 +113,7 @@
     z-index: 11;
 }
 
-#gameFieldBlockTurnOverlay{
-
-}
-
-#gameFieldOverlay{
+#gameFieldOverlay {
     background: rgba(255, 255, 255, 0.8);
     text-align: center;
 }

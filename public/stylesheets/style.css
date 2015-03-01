@@ -1,216 +1,170 @@
 body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  background: url(http://subtlepatterns.com/patterns/photography.png);
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    background: url(../images/bg.png);
 }
 
-.right{
-  float: right;
+.right {
+    float: right;
 }
 
-#content{
-  padding: 20px;
+#content {
+    padding: 20px;
 }
 
-footer{
-  position: relative;
-  text-align: center;
-  color:#31b0d5;
-  font-size: 0.8em;
-  margin: 10px 20px 20px 20px;
-  padding: 10px;
+footer {
+    position: relative;
+    text-align: center;
+    color: #31b0d5;
+    font-size: 0.8em;
+    margin: 10px 20px 20px 20px;
+    padding: 10px;
 }
 
 footer a,
-footer a:hover{
-  color: #31b0d5;
-  text-decoration: none;
+footer a:hover {
+    color: #31b0d5;
+    text-decoration: none;
 }
 
-footer .love{
-  color: #d9534f;
+footer .love {
+    color: #d9534f;
 }
 
-footer .alpha{
-  color: #333;
-  bottom: 20px;
-  right: 0px;
-  position: absolute;
+footer .alpha {
+    color: #333;
+    bottom: 20px;
+    right: 0px;
+    position: absolute;
 }
 
-.panel-info{
-  border-color: #31b0d5;
+.panel-info {
+    border-color: #31b0d5;
 }
 
-.panel-info>.panel-heading {
-  color: #fff;
-  background-color: #31b0d5;
-  border-color: #31b0d5;
+.panel-info > .panel-heading {
+    color: #fff;
+    background-color: #31b0d5;
+    border-color: #31b0d5;
 }
 
 .navbar {
-  background: #31b0d5;
-  border: 1px solid #46b8da;
-  text-align: center;
-  padding: 10px 0 0 0;
+    background: #31b0d5;
+    border: 1px solid #46b8da;
+    text-align: center;
+    padding: 10px 0 0 0;
 }
 
-.navbar .brand{
-  text-shadow: 3px 2px 0px #1d9d74, 2px 2px 0px rgba(0, 0, 0, 0.15);
-  color:#fff;
-  font-weight: 300;
-  font-size: 20px;
+.navbar .brand {
+    text-shadow: 3px 2px 0px #1d9d74, 2px 2px 0px rgba(0, 0, 0, 0.15);
+    color: #fff;
+    font-weight: 300;
+    font-size: 20px;
 }
 
 #gameContent,
-#chatContent{
-  margin-bottom: 20px;
+#chatContent {
+    margin-bottom: 20px;
 }
 
 #chatContent .panel-body,
 #findGameContent .panel-body,
-#gameBoardLines{
-  height: 450px;
-  overflow: auto;
+#gameBoardLines {
+    height: 450px;
+    overflow: auto;
 }
 
 #addMessageBtn,
 #leaveGameBtn,
 #createGameBtn {
-  text-transform: uppercase;
+    text-transform: uppercase;
 }
 
-.panel-title{
-  text-transform: capitalize;
+.panel-title {
+    text-transform: capitalize;
 }
 
 #gameBoardLines button,
-#gameBoardLines .label-info{
-  float: right;
+#gameBoardLines .label-info {
+    float: right;
 }
 
 #gameBoardLines .label-info {
-  padding: 5px 5px;
+    padding: 5px 5px;
 }
 
-.form-control:focus{
-  box-shadow:none;
+.form-control:focus {
+    box-shadow: none;
 }
 
 .list-group-item:first-child {
-  border: 0;
-}
-
-.tic-tac-toe {
-  height: 450px;
-  width: 390px;
-  overflow: hidden;
-  margin: 0px auto 10px auto;
-  position: relative;
-}
-
-.tic-tac-toe label.left{
-  left: 0px;
-}
-
-.tic-tac-toe label.middle{
-  left: 130px;
-}
-
-.tic-tac-toe label.right{
-  left: 260px;
-}
-
-.tic-tac-toe label.top{
-  top: 0px;
-}
-
-.tic-tac-toe label.center{
-  top: 130px;
-}
-
-.tic-tac-toe label.bottom{
-  top: 260px;
-}
-
-.tic-tac-toe label {
-  height: 120px;
-  width: 120px;
-  display: block;
-}
-
-.tic-tac-toe label:hover {
-  background-color: #31b0d5;
-}
-
-.tic-tac-toe label:hover:after {
-  opacity: .4;
+    border: 0;
 }
 
 #leaveGameBtn {
-  position: absolute;
-  top: 410px;
-  left: 5px;
+    position: absolute;
+    top: 410px;
+    left: 5px;
 }
 
 #gameTitleTable {
-  width: 450px;
-  margin: 0px auto 0px auto;
+    width: 450px;
+    margin: 0px auto 0px auto;
 }
 
 #user1NameLbl,
 #user2NameLbl,
-#userVs{
-  vertical-align: top;
-  text-align: center;
-  padding-bottom: 5px;
-  font-size: 1.8em;
+#userVs {
+    vertical-align: top;
+    text-align: center;
+    padding-bottom: 5px;
+    font-size: 1.8em;
 }
 
 #user1NameLbl,
-#user2NameLbl{
-  width: 210px;
+#user2NameLbl {
+    width: 210px;
 }
 
-.cup{
-  height: 64px;
-  min-width: 64px;
-  background: url('../images/cup_64.png') no-repeat center;
-  padding-top: 6px;
-  text-align: center;
-  vertical-align: top;
+.cup {
+    height: 64px;
+    min-width: 64px;
+    background: url('../images/cup_64.png') no-repeat center;
+    padding-top: 6px;
+    text-align: center;
+    vertical-align: top;
 }
 
-.cup span{
-  color:#fff;
-  text-shadow: 2px 1px 0px #ecaf4f, 2px 2px 0px #ccc;
+.cup span {
+    color: #fff;
+    text-shadow: 2px 1px 0px #ecaf4f, 2px 2px 0px #ccc;
 }
 
 #playAgainBtn {
-  background: #333;
-  color: #fff;
+    background: #333;
+    color: #fff;
 }
 
 #playAgainBtn:hover {
-  background: #444;
+    background: #444;
 }
 
-.ui-pnotify.custom .alert-warning{
-  background: #000;
-  color:#fff;
-  border: 0;
-  cursor: pointer;
+.ui-pnotify.custom .alert-warning {
+    background: #000;
+    color: #fff;
+    border: 0;
+    cursor: pointer;
 }
 
-.user-move-pointer-container{
-  display: inline-block;
-  height: 14px;
-  text-align: center;
+.user-move-pointer-container {
+    display: inline-block;
+    height: 14px;
+    text-align: center;
 }
 
-.move-pointer{
-  color: #777;
-  display: inline-block;
-  height: 11px;
-  margin-left: 98px;
-  font-size: 0.8em;
+.move-pointer {
+    color: #777;
+    display: inline-block;
+    height: 11px;
+    margin-left: 98px;
+    font-size: 0.8em;
 }

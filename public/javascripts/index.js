@@ -118,15 +118,16 @@ $(function(){
         console.log('update game result');
 
         $user1NameLbl.text(game.user1.name).css('color', game.user1.color);
-        $user1ScoreLbl.text(game.score1);
 
         if(game.user2){
             $user2NameLbl.text(game.user2.name).css('color', game.user2.color);
             $user2ScoreLbl.text(game.score2);
+            $user1ScoreLbl.text(game.score1);
         }
         else{
             $user2NameLbl.text('-').css('color', '');
             $user2ScoreLbl.text('-');
+            $user1ScoreLbl.text('-');
         }
     });
 
@@ -278,6 +279,7 @@ $(function(){
         $user1MovePointer.hide();
         $user2MovePointer.show();
 
+        notifyAboutMove();
         initGameField();
         showGameField();
     }
@@ -376,3 +378,9 @@ $(function(){
     socket.emit('newUser', userName);
     $content.fadeIn(ANIMATION_SPEED);
 });
+
+
+//$('#gameFieldLbl .checked').css('transition' , 'none');
+//$('#gameFieldLbl .checked').effect("highlight", {}, 1000, function(){
+//    $(this).css('transition' , '');
+//});
