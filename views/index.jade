@@ -14,15 +14,17 @@ block content
                     span.glyphicon.glyphicon-chevron-right
                     |&nbsp;create new game
             div#gameAreaContent(style='display:none')
-                table#gameTitleTable
+                table#gameTitleTable(style='margin-top:-14px')
                     tr
-                        td#user1Container
-                            i.move-pointer.glyphicon.glyphicon-triangle-bottom(style='display:none')
-                            div#user1NameLbl
-                        td.text-muted vs
-                        td#user2Container
-                            i.move-pointer.glyphicon.glyphicon-triangle-bottom
-                            div#user2NameLbl
+                        td.user-move-pointer-container
+                            i#user1MovePointer.move-pointer.glyphicon.glyphicon-triangle-bottom
+                        td
+                        td.user-move-pointer-container
+                            i#user2MovePointer.move-pointer.glyphicon.glyphicon-triangle-bottom
+                    tr
+                        td#user1NameLbl
+                        td#userVs.text-muted vs
+                        td#user2NameLbl
                     tr
                         td.cup
                             span#user1ScoreLbl
@@ -33,8 +35,8 @@ block content
                     label.left.top(data-x='0', data-y='0')
                     label.middle.top(data-x='0', data-y='1')
                     label.right.top(data-x='0', data-y='2')
-                    label.left.center.cross.checked(data-x='1', data-y='0')
-                    label.middle.center.zero.checked(data-x='1', data-y='1')
+                    label.left.center(data-x='1', data-y='0')
+                    label.middle.center(data-x='1', data-y='1')
                     label.right.center(data-x='1', data-y='2')
                     label.left.bottom(data-x='2', data-y='0')
                     label.middle.bottom(data-x='2', data-y='1')

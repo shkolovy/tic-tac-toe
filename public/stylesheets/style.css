@@ -157,14 +157,18 @@ footer .alpha{
   margin: 0px auto 0px auto;
 }
 
-#gameTitleTable tr:first-child{
-  font-size: 1.8em;
-}
-
-#gameTitleTable td{
+#user1NameLbl,
+#user2NameLbl,
+#userVs{
   vertical-align: top;
   text-align: center;
   padding-bottom: 5px;
+  font-size: 1.8em;
+}
+
+#user1NameLbl,
+#user2NameLbl{
+  width: 210px;
 }
 
 .cup{
@@ -172,6 +176,8 @@ footer .alpha{
   min-width: 64px;
   background: url('../images/cup_64.png') no-repeat center;
   padding-top: 6px;
+  text-align: center;
+  vertical-align: top;
 }
 
 .cup span{
@@ -195,22 +201,16 @@ footer .alpha{
   cursor: pointer;
 }
 
-/*.move-pointer-container{*/
-  /*height: 13px;*/
-  /*width: 13px;*/
-  /*text-align: center;*/
-/*}*/
-
-#user1Container,
-#user2Container{
-  width: 42%;
-  position: relative;
+.user-move-pointer-container{
+  display: inline-block;
+  height: 14px;
+  text-align: center;
 }
 
 .move-pointer{
   color: #777;
-  position: absolute;
-  left: 47%;
-  top: -5px;
-  font-size: 0.5em;
+  display: inline-block;
+  height: 11px;
+  margin-left: 98px;
+  font-size: 0.8em;
 }

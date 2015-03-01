@@ -10,8 +10,11 @@ $(function(){
         CHECKED_CSS = 'checked',
         CROSS_TURN_CSS = 'cross-turn',
         ZERO_TURN_CSS = 'zero-turn',
+        NOTIFY_MOVE_TIME = 5000,
 
         socket = io.connect(),
+
+        moveTimeOut,
 
         userName = 'none',
         isYourTurn = false,
@@ -39,9 +42,10 @@ $(function(){
         $user2NameLbl = $('#user2NameLbl'),
         $user1ScoreLbl = $('#user1ScoreLbl'),
         $user2ScoreLbl = $('#user2ScoreLbl'),
+        $user1MovePointer = $('#user1MovePointer'),
+        $user2MovePointer = $('#user2MovePointer'),
         $gameInfoLbl = $('#gameInfoLbl'),
         $playAgainBtn = $('#playAgainBtn'),
-        $user1Container = $('#user1Container'),
         $user2Container = $('#user2Container'),
         $gameFieldOverlay = $('#gameFieldOverlay'),
         $gameFieldBlockTurnOverlay = $('#gameFieldBlockTurnOverlay');
@@ -104,6 +108,7 @@ $(function(){
 
     socket.on('serverUserLeftGame', function(user){
         console.log('server User Left');
+
         $gameFieldOverlay.show();
         $gameInfoLbl.text('server left the game, leave the game');
         showNotification('user ' + user.name + 'left the game');
@@ -123,33 +128,12 @@ $(function(){
             $user2NameLbl.text('-').css('color', '');
             $user2ScoreLbl.text('-');
         }
-
-        //if(game.user1.id === socket.id){
-        //    $user1NameLbl.text('you').css('color', game.user1.color);
-        //    $user1ScoreLbl.text(game.score1);
-        //
-        //    if(game.user2){
-        //        $user2NameLbl.text(game.user2.name).css('color', game.user2.color);
-        //        $user2ScoreLbl.text(game.score2);
-        //    }
-        //    else{
-        //        $user2NameLbl.text('-').css('color', '');
-        //        $user2ScoreLbl.text('-');
-        //    }
-        //}
-        //else {
-        //    $user1NameLbl.text('you').css('color', game.user2.color);
-        //    $user1ScoreLbl.text(game.score2);
-        //
-        //    $user2NameLbl.text(game.user1.name).css('color', game.user1.color);
-        //    $user2ScoreLbl.text(game.score1);
-        //}
-
     });
 
     socket.on('userJoinGame', function(user){
         console.log('userJoinGame ' + user.name);
 
+        toggleDropElement($user2MovePointer);
         showNotification('user ' + user.name + 'joined the game');
         $gameFieldOverlay.hide();
         $gameFieldBlockTurnOverlay.show();
@@ -172,6 +156,7 @@ $(function(){
                     .addClass(CHECKED_CSS).addClass(isCross ? ZERO_CSS : CROSS_CSS);
 
         showWhoseTurn();
+        notifyAboutMove();
     });
 
     socket.on('showMatchResult', function(data) {
@@ -186,6 +171,7 @@ $(function(){
 
         $playAgainBtn.show();
         $gameFieldOverlay.show();
+        clearGameArena();
     });
 
     function playAgain(){
@@ -260,6 +246,9 @@ $(function(){
         isCross = false;
         isUser1 = true;
 
+        $user1MovePointer.hide();
+        $user2MovePointer.hide();
+
         $gameFieldOverlay.show();
         $gameInfoLbl.text('waiting for an opponent');
 
@@ -271,6 +260,7 @@ $(function(){
         socket.emit('leaveGame');
 
         hideGameField();
+        clearGameArena();
     }
 
     function joinGame(){
@@ -283,6 +273,10 @@ $(function(){
         isUser1 = false;
         isYourTurn = true;
         isCross = true;
+
+        $gameFieldOverlay.hide();
+        $user1MovePointer.hide();
+        $user2MovePointer.show();
 
         initGameField();
         showGameField();
@@ -313,15 +307,36 @@ $(function(){
             y: $el.data('y')
         });
 
+        clearTimeout(moveTimeOut);
+
         $(this).addClass(CHECKED_CSS).addClass(isCross ? CROSS_CSS : ZERO_CSS);
 
         showWhoseTurn();
     }
 
     //helper functions
+    function shakeElement(el){
+        el.effect("shake", {distance: '10', times: '3'} );
+    }
+
+    function toggleDropElement(el){
+        el.toggle("drop", {direction: 'up'} );
+    }
+
+    function notifyAboutMove(){
+        if (moveTimeOut) {
+            clearTimeout(moveTimeOut);
+        }
+
+        moveTimeOut = setTimeout(function () {
+            shakeElement(isUser1 ? $user1MovePointer : $user2MovePointer);
+        }, NOTIFY_MOVE_TIME);
+    }
+
     function showWhoseTurn(){
-        $user1Container.find('.move-pointer').fadeToggle(isUser1 && isYourTurn);
-        $user2Container.find('.move-pointer').fadeToggle(isUser1 && !isYourTurn);
+        toggleDropElement($user1MovePointer);
+        toggleDropElement($user2MovePointer);
+
         $gameFieldBlockTurnOverlay.toggle(!isYourTurn);
     }
 
