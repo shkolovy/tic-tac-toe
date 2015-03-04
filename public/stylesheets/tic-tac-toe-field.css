@@ -114,7 +114,7 @@
 
 #gameFieldOverlay {
     background: rgba(255, 255, 255, 0.8);
-    padding-top: 85px;
+    padding: 85px 20px;
     text-align: center;
 }
 

@@ -148,7 +148,7 @@ $(function(){
         console.log('userLeftGame ' + user.name);
 
         showNotification(user.name + ' has left the game');
-        $gameInfoLbl.text('user left the game, waiting for another');
+        $gameInfoLbl.text('User has left the game,<br /> waiting for another');
         $gameFieldOverlay.show();
     });
 
@@ -210,7 +210,7 @@ $(function(){
             text: text,
             shadow: false,
             icon: false,
-            opacity: .8,
+            opacity: .9,
             addclass: 'custom',
             animate_speed: ANIMATION_SPEED,
             animation: {
@@ -228,7 +228,7 @@ $(function(){
 
     function getFormattedTime(timeStr){
         var date = new Date(timeStr);
-        return date.getHours() + ':' + date.getMinutes()
+        return date.toTimeString().replace(/(\d{2}:\d{2}).*/, "$1");
     }
 
     function updateGameBoardLine(game){
