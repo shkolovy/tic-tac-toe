@@ -4,6 +4,7 @@
 
 $(function(){
     var ANIMATION_SPEED = 400,
+        HIGHLIGHT_DURATION = 1000,
         ENTER_KEY = 13,
         CROSS_CSS = 'cross',
         ZERO_CSS = 'zero',
@@ -21,9 +22,12 @@ $(function(){
         isUser1 = false,
         isCross = false,
 
-        notificationStack = { "dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25 },
+        stack_topright = {"dir1": "down", "dir2": "left", "push": "top", "firstpos1": 25, "firstpos2": 25},
 
         $content = $('#content'),
+        $welcome = $('#welcome'),
+        $userNameTxt = $('#userNameTxt'),
+        $userNameContainer = $('#userNameContainer'),
         $userNameLbl = $('#userNameLbl'),
         $messagesLbl = $('#messagesLbl'),
         $messageTxt = $('#messageTxt'),
@@ -110,8 +114,8 @@ $(function(){
         console.log('server User Left');
 
         $gameFieldOverlay.show();
-        $gameInfoLbl.text('server left the game, leave the game');
-        showNotification('user ' + user.name + 'left the game');
+        $gameInfoLbl.text('Opponent has left the game, join another or start your own');
+        showNotification('User ' + user.name + 'has left the game');
     });
 
     socket.on('updateGameResult', function(game){
@@ -135,7 +139,7 @@ $(function(){
         console.log('userJoinGame ' + user.name);
 
         toggleDropElement($user2MovePointer);
-        showNotification('user ' + user.name + 'joined the game');
+        showNotification(user.name + ' has joined the game');
         $gameFieldOverlay.hide();
         $gameFieldBlockTurnOverlay.show();
     });
@@ -143,21 +147,26 @@ $(function(){
     socket.on('userLeftGame', function(user){
         console.log('userLeftGame ' + user.name);
 
-        showNotification('user ' + user.name + 'left the game');
+        showNotification(user.name + ' has left the game');
         $gameInfoLbl.text('user left the game, waiting for another');
         $gameFieldOverlay.show();
     });
 
-    socket.on('showOpponentMove', function(move) {
-        console.log('opponent moved ' + move.x + ':' + move.y);
+    socket.on('showOpponentMove', function(data) {
+        console.log('opponent moved ' + data.move.x + ':' + data.move.y);
 
         isYourTurn = true;
 
-        $gameFieldLbl.find('label[data-x=' + move.x + '][data-y=' + move.y + ']')
+        $gameFieldLbl.find('label[data-x=' + data.move.x + '][data-y=' + data.move.y + ']')
                     .addClass(CHECKED_CSS).addClass(isCross ? ZERO_CSS : CROSS_CSS);
 
-        showWhoseTurn();
-        notifyAboutMove();
+        if(data.hasWinner){
+            $gameFieldBlockTurnOverlay.show();
+        }
+        else{
+            showWhoseTurn();
+            notifyAboutMove();
+        }
     });
 
     socket.on('showMatchResult', function(data) {
@@ -167,32 +176,48 @@ $(function(){
             $gameInfoLbl.text('tie');
         }
         else{
-            $gameInfoLbl.text(data.winner.id === socket.id ? 'you won' : 'you lost');
+            //debugger;
+            $.each(data.winCombination, function(i, move){
+                var $el = $gameFieldLbl.find('label[data-x=' + move.x + '][data-y=' + move.y + ']');
+
+                $el.css('transition' , 'none');
+                $el.effect("highlight", {}, HIGHLIGHT_DURATION, function(){
+                    $el.css('transition' , '');
+                });
+            });
+
+            $gameInfoLbl.text(data.winner.id === socket.id ? 'You Won' : 'You Lost');
         }
 
-        $playAgainBtn.show();
-        $gameFieldOverlay.show();
-        clearGameArena();
+        //block game arena after winning animation
+        setTimeout(function(){
+            $playAgainBtn.show();
+            $gameFieldOverlay.show();
+        }, HIGHLIGHT_DURATION + 100);
     });
 
     function playAgain(){
         console.log('play again');
+
+        $playAgainBtn.hide();
+        $gameFieldOverlay.hide();
+        clearGameArena();
     }
 
     function showNotification(text){
         var n = new PNotify({
+            stack: stack_topright,
             text: text,
             shadow: false,
             icon: false,
             opacity: .8,
-            addclass: 'stack-bottomright custom',
-            stack: notificationStack,
+            addclass: 'custom',
             animate_speed: ANIMATION_SPEED,
             animation: {
                 'effect_in': 'drop',
-                'options_in': 'linear',
+                'options_in': 'easeOutElastic',
                 'effect_out': 'drop',
-                'options_out': 'linear'
+                'options_out': 'easeOutElastic'
             }
         });
 
@@ -251,7 +276,7 @@ $(function(){
         $user2MovePointer.hide();
 
         $gameFieldOverlay.show();
-        $gameInfoLbl.text('waiting for an opponent');
+        $gameInfoLbl.text('Waiting for an opponent');
 
         initGameField();
         showGameField();
@@ -284,12 +309,34 @@ $(function(){
         showGameField();
     }
 
+    function enterNameOnEnterClick(e){
+        var key = e.which,
+            $el = $(this);
+
+        if(key == ENTER_KEY){
+            if($el.val().length > 0){
+                userName = $el.val();
+
+                $userNameLbl.text(', ' + userName + '!');
+                socket.emit('newUser', userName);
+
+                $welcome.fadeOut(ANIMATION_SPEED);
+                $content.fadeIn(ANIMATION_SPEED);
+
+                return false;
+            }
+            else{
+                shakeElement($userNameContainer);
+            }
+        }
+    }
+
     function addMessageOnEnterClick(e) {
         var key = e.which;
 
         if(key == ENTER_KEY){
             if($(this).val().length > 0){
-                $addMessageBtn.click();
+                addMessage();
                 return false;
             }
         }
@@ -359,7 +406,9 @@ $(function(){
     }
 
     function clearGameArena(){
-        $gameFieldLbl.find('label').removeClass(CROSS_CSS).removeClass(ZERO_CSS);
+        $gameFieldLbl.find('label').removeClass(CROSS_CSS)
+                                    .removeClass(ZERO_CSS)
+                                    .removeClass(CHECKED_CSS);
     }
 
     //init ui controls
@@ -367,16 +416,13 @@ $(function(){
     $createGameBtn.on('click', createNewGame);
     $leaveGameBtn.on('click', leaveGame);
     $messageTxt.on('keypress', addMessageOnEnterClick);
+    $userNameTxt.on('keypress', enterNameOnEnterClick);
     $gameBoardLines.on('click', 'button', joinGame);
     $gameFieldLbl.on('click', 'label', move);
+    $playAgainBtn.on('click', playAgain);
 
+    $userNameTxt.select();
     $('[data-toggle="tooltip"]').tooltip();
-
-    userName = prompt("Please enter your name", userName);
-
-    $userNameLbl.text(', ' + userName + '!');
-    socket.emit('newUser', userName);
-    $content.fadeIn(ANIMATION_SPEED);
 });
 
 

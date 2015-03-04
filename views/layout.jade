@@ -6,13 +6,18 @@ html
         link(rel='stylesheet', href='/stylesheets/pnotify.custom.min.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
         link(rel='stylesheet', href='/stylesheets/tic-tac-toe-field.css')
+        link(rel='stylesheet', href='/stylesheets/font-awesome.min.css')
+
     body
+        div#welcome
+            div#userNameContainer
+                div#greetingLbl welcome
+                input#userNameTxt.form-control(type=text, placeholder="enter your name", maxlength=14)
         div.navbar.navbar-static-top.bs-docs-nav
             div.container
                  span.brand Tic Tac Toe
                     span#userNameLbl
-        #content(style='display:none')
-            block content
+        block content
         footer
             |Made with
             a.love(href='http://www.shkolovy.com')&nbsp;❤&nbsp;
@@ -20,6 +25,7 @@ html
             div
                 a(href='https://github.com/artemdude/tic-tac-toe') project on github
             div.alpha α version
+
     script(src='javascripts/libs/jquery.min.js')
     script(src='javascripts/libs/jquery-ui.min.js')
     script(src='javascripts/libs/bootstrap.min.js')

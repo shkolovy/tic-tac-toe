@@ -4,7 +4,7 @@
 
 module.exports = function(server){
     var io = require('socket.io').listen(server),
-        board = require('./board'),
+        board = require('./board1'),
         users = {},
         boards = {},
         games = {},
@@ -78,7 +78,8 @@ module.exports = function(server){
                id: id,
                user1: users[socket.id],
                score1: 0,
-               score2: 0
+               score2: 0,
+               arena: new board()
             };
 
             gamesCount++;
@@ -130,21 +131,45 @@ module.exports = function(server){
         socket.on('move', function (move) {
             var user = users[socket.id],
                 game = games[user.gameId],
-                opponent = users[user.opponentId];
+                opponent = users[user.opponentId],
+                arena = game.arena,
+                winCombination;
 
-            if(move.x === 7){
-                io.to('gameRoom' + game.id).emit('showMatchResult', {
-                    isDraw: false,
-                    winner: user
-                });
-            }
-            else if(move.x === 6){
-                io.to('gameRoom' + game.id).emit('showMatchResult', {
-                    isDraw: true
-                });
-            }
+            arena.set(move);
 
-            io.to(opponent.id).emit('showOpponentMove', move);
+            winCombination = arena.check(move);
+
+            io.to(opponent.id).emit('showOpponentMove', {
+                move: move,
+                hasWinner: winCombination
+            });
+
+            if(winCombination){
+                if(game.user1 === user){
+                    game.score1++;
+                }
+                else{
+                    game.score2++;
+                }
+
+                io.to('gameRoom' + game.id).emit('showMatchResult', {
+                            isDraw: false,
+                            winner: user,
+                            winCombination: winCombination
+                        });
+
+                io.emit('updateGameBoardLine', {
+                    game: game,
+                    gamesCount: gamesCount
+                });
+
+                io.to('gameRoom' + game.id).emit('updateGameResult', game);
+            }
+            else if(!arena.hasMoves()){
+                io.to('gameRoom' + game.id).emit('showMatchResult', {
+                            isDraw: true
+                        });
+            }
         });
 
         function leaveGame(){

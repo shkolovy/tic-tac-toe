@@ -1,62 +1,69 @@
 extends layout
 
 block content
-    div.row
-        div#gameContent.col-md-6
-            div#findGameContent
+    div#content(style='display:none')
+        div.row
+            div#gameContent.col-md-6
+                div#findGameContent
+                    div.panel.panel-info
+                        div.panel-heading
+                            h3.panel-title games board
+                                span#gamesCountLbl.badge.right(title='active games', data-toggle='tooltip') 1
+                        div#noGamesLbl.panel-body(style='display:none')
+                            div No active games :(
+                            i.fa.fa-gamepad
+                            div But, you can start a new one!
+                        ul#gameBoardLines.list-group
+                    button#createGameBtn.btn.btn-warning
+                        span.glyphicon.glyphicon-chevron-right
+                        |&nbsp;create new game
+                div#gameAreaContent(style='display:none')
+                    table#gameTitleTable(style='margin-top:-14px')
+                        tr
+                            td.user-move-pointer-container
+                                i#user1MovePointer.move-pointer.glyphicon.glyphicon-triangle-bottom
+                            td
+                            td.user-move-pointer-container
+                                i#user2MovePointer.move-pointer.glyphicon.glyphicon-triangle-bottom
+                        tr
+                            td#user1NameLbl
+                            td#userVs.text-muted vs
+                            td#user2NameLbl
+                        tr
+                            td.cup
+                                span#user1ScoreLbl
+                            td
+                            td.cup
+                                span#user2ScoreLbl
+                    div#gameFieldLbl.tic-tac-toe.cross-turn
+                        label.left.top(data-x='0', data-y='0')
+                        label.middle.top(data-x='0', data-y='1')
+                        label.right.top(data-x='0', data-y='2')
+                        label.left.center(data-x='1', data-y='0')
+                        label.middle.center(data-x='1', data-y='1')
+                        label.right.center(data-x='1', data-y='2')
+                        label.left.bottom(data-x='2', data-y='0')
+                        label.middle.bottom(data-x='2', data-y='1')
+                        label.right.bottom(data-x='2', data-y='2')
+                        div#gameFieldBlockTurnOverlay(style='display:none')
+                        div#gameFieldOverlay(style='display:none')
+                            div#gameInfoLbl
+                            button#playAgainBtn.btn(style='display:none') play again
+                        button#leaveGameBtn.btn.btn-info
+                            span.glyphicon.glyphicon-chevron-left
+                            |leave game
+            div#chatContent.col-md-6
                 div.panel.panel-info
                     div.panel-heading
-                        h3.panel-title games board
-                            span#gamesCountLbl.badge.right(title='active games', data-toggle='tooltip') 1
-                    div#noGamesLbl.panel-body(style='display:none') no active games :(
-                    ul#gameBoardLines.list-group
-                button#createGameBtn.btn.btn-warning
-                    span.glyphicon.glyphicon-chevron-right
-                    |&nbsp;create new game
-            div#gameAreaContent(style='display:none')
-                table#gameTitleTable(style='margin-top:-14px')
-                    tr
-                        td.user-move-pointer-container
-                            i#user1MovePointer.move-pointer.glyphicon.glyphicon-triangle-bottom
-                        td
-                        td.user-move-pointer-container
-                            i#user2MovePointer.move-pointer.glyphicon.glyphicon-triangle-bottom
-                    tr
-                        td#user1NameLbl
-                        td#userVs.text-muted vs
-                        td#user2NameLbl
-                    tr
-                        td.cup
-                            span#user1ScoreLbl
-                        td
-                        td.cup
-                            span#user2ScoreLbl
-                div#gameFieldLbl.tic-tac-toe.cross-turn
-                    label.left.top(data-x='0', data-y='0')
-                    label.middle.top(data-x='0', data-y='1')
-                    label.right.top(data-x='0', data-y='2')
-                    label.left.center(data-x='1', data-y='0')
-                    label.middle.center(data-x='1', data-y='1')
-                    label.right.center(data-x='1', data-y='2')
-                    label.left.bottom(data-x='2', data-y='0')
-                    label.middle.bottom(data-x='2', data-y='1')
-                    label.right.bottom(data-x='2', data-y='2')
-                    div#gameFieldBlockTurnOverlay(style='display:none')
-                    div#gameFieldOverlay(style='display:none')
-                        div#gameInfoLbl
-                        button#playAgainBtn.btn(style='display:none') play again
-                    button#leaveGameBtn.btn.btn-info
-                        span.glyphicon.glyphicon-chevron-left
-                        |leave game
-        div#chatContent.col-md-6
-            div.panel.panel-info
-                div.panel-heading
-                    h3.panel-title chat room
-                        span#usersOnlineCountLbl.badge.right(title='users online', data-toggle='tooltip') 1
-                div#messageContainer.panel-body
-                    div#messagesLbl
-                div.panel-footer
-                    div.input-group
-                        input#messageTxt.form-control(type="text", placeholder="enter message", maxlength=300)
-                        span.input-group-btn
-                            button#addMessageBtn.btn.btn-info send
+                        h3.panel-title chat room
+                            span#usersOnlineCountLbl.badge.right(title='users online', data-toggle='tooltip') 1
+                    div#messageContainer.panel-body
+                        div#messagesLbl
+                    div.panel-footer
+                        div.input-group
+                            input#messageTxt.form-control(type="text", placeholder="enter message", maxlength=300)
+                            span.input-group-btn
+                                button#addMessageBtn.btn.btn-info send
+
+
+

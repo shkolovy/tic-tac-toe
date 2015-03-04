@@ -142,6 +142,10 @@ footer .alpha {
 #playAgainBtn {
     background: #333;
     color: #fff;
+    padding: 8px 30px;
+    font-size: 1.3em;
+    margin-top: 20px;
+    text-transform: capitalize;
 }
 
 #playAgainBtn:hover {
@@ -153,6 +157,8 @@ footer .alpha {
     color: #fff;
     border: 0;
     cursor: pointer;
+    font-size: .8em;
+    font-weight: 300;
 }
 
 .user-move-pointer-container {
@@ -167,4 +173,47 @@ footer .alpha {
     height: 11px;
     margin-left: 98px;
     font-size: 0.8em;
+}
+
+#noGamesLbl{
+    color: #999;
+    font-size: 2em;
+    text-align: center;
+}
+
+#noGamesLbl i{
+    font-size: 9em;
+    margin-bottom: 40px;
+}
+
+#welcome{
+    background-size: cover;
+    background: url(../images/welcome.jpg) no-repeat center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+}
+
+#userNameContainer {
+    margin: auto 25%;
+    padding-top: 20%;
+    text-align: center;
+}
+
+#greetingLbl {
+    text-transform: uppercase;
+    font-size: 5em;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+#userNameTxt{
+    font-size: 2em;
+    height: 60px;
+    text-align: center;
+    text-transform: uppercase;
+    opacity: 0.95;
 }
