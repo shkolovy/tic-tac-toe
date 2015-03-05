@@ -119,7 +119,22 @@
 }
 
 #gameInfoLbl{
+    color:#666;
+    line-height: 1.4em;
     font-size: 2.3em;
     font-weight: 300;
     font-family: 'Open Sans', sans-serif;
+}
+
+#playAgainBtn {
+    background: #666;
+    color: #fff;
+    padding: 8px 30px;
+    font-size: 1.3em;
+    margin-top: 20px;
+    text-transform: capitalize;
+}
+
+#playAgainBtn:hover {
+    background: #333;
 }

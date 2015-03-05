@@ -103,8 +103,11 @@ module.exports = function(server){
         socket.on('joinGame', function (data){
             console.log('join Game', data.gameId);
 
-            var game = games[data.gameId];
-            game.user2 = users[socket.id];
+            var game = games[data.gameId],
+                user = users[socket.id];
+
+            game.user2 = user;
+            game.startMatch = user;
 
             users[socket.id].gameId = game.id;
             users[socket.id].opponentId = game.user1.id;
@@ -116,12 +119,32 @@ module.exports = function(server){
 
             io.to('gameRoom' + data.gameId).emit('updateGameResult', game);
 
-            io.to(game.user1.id).emit('userJoinGame', users[socket.id]);
+            io.to(game.user1.id).emit('userJoinGame', user);
 
             io.emit('updateGameBoardLine', {
                 game: game,
                 gamesCount: gamesCount
             });
+        });
+
+        socket.on('playAgain', function (){
+            var user = users[socket.id],
+                game = games[user.gameId];
+
+            if(user.id === game.user1.id){
+                game.ready1 = true;
+            }
+            else {
+                game.ready2 = true;
+            }
+
+            if(game.ready1 && game.ready2){
+                game.startMatch = game.startMatch === user ? users[user.opponentId] : user;
+                game.arena = new board();
+                io.to('gameRoom' + game.id).emit('newMatch', game);
+                game.ready1 = false;
+                game.ready2 = false;
+            }
         });
 
         socket.on('leaveGame', function (){
@@ -190,7 +213,7 @@ module.exports = function(server){
                 }
                 else if(gameToLeave.user2 && gameToLeave.user2.id === socket.id){
                     gameToLeave.user2 = undefined;
-                    io.to('gameRoom' + gameToLeave.id).emit('updateGameResult', gameToLeave);
+                    //io.to('gameRoom' + gameToLeave.id).emit('updateGameResult', gameToLeave);
                     io.to(gameToLeave.user1.id).emit('userLeftGame', user);
                 }
 

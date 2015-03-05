@@ -110,14 +110,6 @@ $(function(){
         }
     });
 
-    socket.on('serverUserLeftGame', function(user){
-        console.log('server User Left');
-
-        $gameFieldOverlay.show();
-        $gameInfoLbl.text('Opponent has left the game, join another or start your own');
-        showNotification('User ' + user.name + 'has left the game');
-    });
-
     socket.on('updateGameResult', function(game){
         console.log('update game result');
 
@@ -144,12 +136,24 @@ $(function(){
         $gameFieldBlockTurnOverlay.show();
     });
 
+    socket.on('serverUserLeftGame', function(user){
+        console.log('server User Left');
+
+        $gameFieldOverlay.show();
+        $playAgainBtn.hide();
+        $gameInfoLbl.text('Opponent has left the game, join another or start your own');
+        showNotification('User ' + user.name + 'has left the game');
+        hideTurnIndicators
+    });
+
     socket.on('userLeftGame', function(user){
         console.log('userLeftGame ' + user.name);
 
         showNotification(user.name + ' has left the game');
-        $gameInfoLbl.text('User has left the game,<br /> waiting for another');
+        $gameInfoLbl.text('User has left the game, waiting for another');
+        $playAgainBtn.hide();
         $gameFieldOverlay.show();
+        hideTurnIndicators();
     });
 
     socket.on('showOpponentMove', function(data) {
@@ -196,12 +200,21 @@ $(function(){
         }, HIGHLIGHT_DURATION + 100);
     });
 
+    socket.on('newMatch', function(game) {
+        $gameFieldOverlay.hide();
+        if(game.startMatch.id === socket.id){
+            $gameFieldBlockTurnOverlay.hide();
+        }
+        clearGameArena();
+    });
+
     function playAgain(){
         console.log('play again');
 
         $playAgainBtn.hide();
-        $gameFieldOverlay.hide();
-        clearGameArena();
+        $gameInfoLbl.text('Waiting for opponent response');
+        //$gameFieldOverlay.hide();
+        socket.emit('playAgain');
     }
 
     function showNotification(text){
@@ -276,7 +289,7 @@ $(function(){
         $user2MovePointer.hide();
 
         $gameFieldOverlay.show();
-        $gameInfoLbl.text('Waiting for an opponent');
+        $gameInfoLbl.text('Waiting for opponent');
 
         initGameField();
         showGameField();
@@ -380,6 +393,11 @@ $(function(){
         moveTimeOut = setTimeout(function () {
             shakeElement(isUser1 ? $user1MovePointer : $user2MovePointer);
         }, NOTIFY_MOVE_TIME);
+    }
+
+    function hideTurnIndicators(){
+        $user1MovePointer.hide();
+        $user2MovePointer.hide();
     }
 
     function showWhoseTurn(){

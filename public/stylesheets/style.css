@@ -139,19 +139,6 @@ footer .alpha {
     text-shadow: 2px 1px 0px #ecaf4f, 2px 2px 0px #ccc;
 }
 
-#playAgainBtn {
-    background: #333;
-    color: #fff;
-    padding: 8px 30px;
-    font-size: 1.3em;
-    margin-top: 20px;
-    text-transform: capitalize;
-}
-
-#playAgainBtn:hover {
-    background: #444;
-}
-
 .ui-pnotify.custom .alert-warning {
     background: #000;
     color: #fff;
