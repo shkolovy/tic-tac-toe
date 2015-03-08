@@ -4,7 +4,7 @@
 
 module.exports = function(server){
     var io = require('socket.io').listen(server),
-        board = require('./board1'),
+        board = require('./ticTacToe'),
         users = {},
         boards = {},
         games = {},
@@ -150,9 +150,9 @@ module.exports = function(server){
             if(game.ready1 && game.ready2){
                 game.startMatch = game.startMatch === user ? users[user.opponentId] : user;
                 game.arena = new board();
-                io.to('gameRoom' + game.id).emit('newMatch', game);
                 game.ready1 = false;
                 game.ready2 = false;
+                io.to('gameRoom' + game.id).emit('newMatch', game);
             }
         });
 
@@ -165,18 +165,18 @@ module.exports = function(server){
                 game = games[user.gameId],
                 opponent = users[user.opponentId],
                 arena = game.arena,
-                winCombination;
+                hasWinner = false;
 
-            arena.set(move);
+            arena.move(move);
 
-            winCombination = arena.check(move);
+            hasWinner = arena.check(move);
 
             io.to(opponent.id).emit('showOpponentMove', {
                 move: move,
-                hasWinner: winCombination
+                hasWinner: hasWinner
             });
 
-            if(winCombination){
+            if(hasWinner){
                 if(game.user1 === user){
                     game.score1++;
                 }
@@ -185,9 +185,9 @@ module.exports = function(server){
                 }
 
                 io.to('gameRoom' + game.id).emit('showMatchResult', {
-                            isDraw: false,
+                            isTie: false,
                             winner: user,
-                            winCombination: winCombination
+                            winCombination: arena.getWinCombination()
                         });
 
                 io.emit('updateGameBoardLine', {
@@ -197,10 +197,8 @@ module.exports = function(server){
 
                 io.to('gameRoom' + game.id).emit('updateGameResult', game);
             }
-            else if(!arena.hasMoves()){
-                io.to('gameRoom' + game.id).emit('showMatchResult', {
-                            isDraw: true
-                        });
+            else if(arena.isTie()){
+                io.to('gameRoom' + game.id).emit('showMatchResult', { isTie: true });
             }
         });
 
@@ -222,7 +220,6 @@ module.exports = function(server){
                 }
                 else if(gameToLeave.user2 && gameToLeave.user2.id === socket.id){
                     gameToLeave.user2 = undefined;
-                    //io.to('gameRoom' + gameToLeave.id).emit('updateGameResult', gameToLeave);
                     io.to(gameToLeave.user1.id).emit('userLeftGame', user);
                 }
 

@@ -174,15 +174,14 @@ $(function(){
     });
 
     socket.on('showMatchResult', function(data) {
-        console.log('match result ' + (data.isDraw ? 'tie' : data.winner.name));
+        console.log('match result ' + (data.isTie ? 'tie' : data.winner.name));
 
         var message;
 
-        if(data.isDraw){
+        if(data.isTie){
             message = 'tie';
         }
         else{
-            //debugger;
             $.each(data.winCombination, function(i, move){
                 var $el = $gameFieldLbl.find('label[data-x=' + move.x + '][data-y=' + move.y + ']');
 
