@@ -7,9 +7,10 @@ function TicTacToe(){
         xTurn = true,
         movesHistory = [],
         winCombination = [],
-        finished = false;
+        finished = false,
+        minMovesCountToCheck = 5;
 
-    function gameFinished(){
+    function isGameFinished(){
         return finished;
     }
 
@@ -21,7 +22,11 @@ function TicTacToe(){
         var hasMatch = false;
 
         if(finished){
-            return true;
+            return;
+        }
+
+        if(movesHistory.length < minMovesCountToCheck){
+            return;
         }
 
         //check vertical
@@ -31,14 +36,20 @@ function TicTacToe(){
                 break;
             }
 
-            hasMatch = i !== 0 && arr[i][move.y] === arr[i-1][move.y];
+            if(i !== 0){
+                hasMatch = arr[i][move.y] === arr[i-1][move.y];
+
+                if(!hasMatch){
+                    break;
+                }
+            }
 
             winCombination.push({x: i, y: move.y});
         }
 
         if(hasMatch){
             finished = true;
-            return true;
+            return;
         }
 
         winCombination = [];
@@ -50,82 +61,101 @@ function TicTacToe(){
                 break;
             }
 
-            hasMatch = i !== 0 && arr[move.x][i] === arr[move.x][i-1];
+            if(i !== 0){
+                hasMatch = arr[move.x][i] === arr[move.x][i-1];
 
-            if(hasMatch) {
-                winCombination.push({x: move.x, y: i});
+                if(!hasMatch){
+                    break;
+                }
             }
+
+            winCombination.push({x: move.x, y: i});
         }
 
         if(hasMatch){
             finished = true;
-            return true;
+            return;
         }
 
         winCombination = [];
 
-        //check diagonal
-        //middle
-        if(move.x === 1 && move.y === 1){
-            hasMatch = checkDiagonal(true);
-
-            if(!hasMatch){
-                winCombination = [];
-                hasMatch = checkDiagonal(false);
-            }
-        }
-        else{
-            hasMatch = checkDiagonal(move.y === 0);
-        }
+        //check left diagonal
+        hasMatch = checkLeftDiagonal();
 
         if(hasMatch){
             finished = true;
-            return true;
+            return;
         }
 
         winCombination = [];
 
-        return false;
-    };
+        //check right diagonal
+        hasMatch = checkRightDiagonal();
 
-    function checkDiagonal(isLeft){
+        if(hasMatch){
+            finished = true;
+            return;
+        }
+
+        winCombination = [];
+
+        return;
+    }
+
+    function checkLeftDiagonal(){
         var hasMatch = false,
-            prevItem,
             j = 0;
 
-        if(isLeft){
-            for(var i = 0; i < 3; i++){
-                if(arr[i][j] === undefined){
-                    hasMatch = false;
+        for(var i = 0; i < 3; i++){
+            if(arr[i][j] === undefined){
+                hasMatch = false;
+                break;
+            }
+
+            if(i !== 0){
+                hasMatch = arr[i][j] === arr[i-1][j-1];
+
+                if(!hasMatch){
                     break;
                 }
-
-                hasMatch = arr[i][j] === prevItem;
-                prevItem = arr[i][j];
-                winCombination.push({x: i, y: j});
-                j++;
             }
-        }
-        else{
-            for(var i = 2; i <= 0; i--){
-                if(arr[i][j] === undefined){
-                    hasMatch = false;
-                    break;
-                }
 
-                hasMatch = arr[i][j] === prevItem;
-                prevItem = arr[i][j];
-                winCombination.push({x: i, y: j});
-                j++;
-            }
+            winCombination.push({x: i, y: j});
+            j++;
         }
 
         return hasMatch;
-    };
+    }
+
+
+    function checkRightDiagonal(){
+        var hasMatch = false,
+            j = 2;
+
+        for(var i = 0; i < 3; i++){
+            if(arr[i][j] === undefined){
+                hasMatch = false;
+                break;
+            }
+
+            if(i !== 0){
+                hasMatch = arr[i][j] === arr[i-1][j+1];
+
+                if(!hasMatch){
+                    break;
+                }
+            }
+
+            winCombination.push({x: i, y: j});
+            j--;
+        }
+
+        return hasMatch;
+    }
 
     function isXTurn(){
         return xTurn;
-    };
+    }
 
     function move(move){
         if(finished){
@@ -143,26 +173,27 @@ function TicTacToe(){
                 move: move,
                 value: arr[move.x][move.y]
             });
+
+            check(move);
         }
-    };
+    }
 
     function isTie(){
         return movesHistory.length === 9;
-    };
+    }
 
     function isOccupied(move){
         return arr[move.x][move.y] !== undefined;
-    };
+    }
 
     function getBoard(){
         return arr;
-    };
+    }
 
-    this.gameFinished = gameFinished;
+    this.isGameFinished = isGameFinished;
     this.getWinCombination = getWinCombination;
     this.isTie = isTie;
     this.isOccupied = isOccupied;
-    this.check = check;
     this.move = move;
     this.getBoard = getBoard;
     this.isXTurn = isXTurn;

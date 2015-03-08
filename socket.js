@@ -4,7 +4,7 @@
 
 module.exports = function(server){
     var io = require('socket.io').listen(server),
-        board = require('./ticTacToe'),
+        board = require('./tic-tac-toe'),
         users = {},
         boards = {},
         games = {},
@@ -161,22 +161,26 @@ module.exports = function(server){
         });
 
         socket.on('move', function (move) {
+            console.log('move: ' + move.x + ',' + move.y);
+
             var user = users[socket.id],
                 game = games[user.gameId],
                 opponent = users[user.opponentId],
                 arena = game.arena,
-                hasWinner = false;
+                gameFinished = false;
 
             arena.move(move);
 
-            hasWinner = arena.check(move);
+            gameFinished = arena.isGameFinished();
+
+            console.log('game finished: ' + gameFinished);
 
             io.to(opponent.id).emit('showOpponentMove', {
                 move: move,
-                hasWinner: hasWinner
+                hasWinner: gameFinished
             });
 
-            if(hasWinner){
+            if(gameFinished){
                 if(game.user1 === user){
                     game.score1++;
                 }
