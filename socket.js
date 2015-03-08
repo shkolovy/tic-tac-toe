@@ -6,7 +6,6 @@ module.exports = function(server){
     var io = require('socket.io').listen(server),
         board = require('./tic-tac-toe'),
         users = {},
-        boards = {},
         games = {},
         gamesCount = 0,
         userCount = 0,
@@ -85,8 +84,6 @@ module.exports = function(server){
             gamesCount++;
 
             users[socket.id].gameId = id;
-
-            //io.to(socket.id).emit('showNewGame', games[id]);
 
             io.to(socket.id).emit('updateGameResult', games[id]);
 

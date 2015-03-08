@@ -54,20 +54,20 @@ $(function(){
 
     //events
     socket.on('updateUsersCount', function(count){
-        log('');
+        log(count, 'updateUsersCount');
 
         $usersOnlineCountLbl.text(count);
     });
 
     socket.on('userLeft', function(data){
-        console.log('user left ' + data.userName);
+        log(data.userName, 'userLeft');
 
         $messagesContent.append('<div><span class="text-muted">[' + getFormattedTime(data.time) +
         ']</span> <span style="color:#d9534f">' + data.userName + '</span> has left</div>');
     });
 
     socket.on('userJoined', function(data){
-        console.log('user joined ' + data.name);
+        log(data.user.name, 'userJoined');
 
         if(data.user.id === socket.id){
             $messagesContent.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> Welcome to chat ;)</div>');
@@ -79,7 +79,8 @@ $(function(){
     });
 
     socket.on('showMessage', function(data){
-        console.log('message from ' + (data.user.id === socket.id ? 'you' : data.user.name) + ': ' + data.message);
+        log((data.user.id === socket.id ? 'you' : data.user.name) + ': ' + data.message, 'showMessage');
+
         $messagesContent.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:' + data.user.color + '">' +
                             (data.user.id === socket.id ? 'you' : data.user.name) + '</span>: ' + data.message + '</div>');
 
@@ -87,7 +88,7 @@ $(function(){
     });
 
     socket.on('updateGameBoardLine', function(data){
-        console.log('update Game Board ' + data.game.id);
+        log(data.game.id, 'updateGameBoardLine');
 
         $gameListContent.toggle(data.gamesCount > 0);
         $noGamesLbl.toggle(data.gamesCount === 0);
@@ -96,14 +97,12 @@ $(function(){
     });
 
     socket.on('refreshGameBoard', function(data){
-        console.log('refresh Game Board');
+        log(null, 'refreshGameBoard');
 
         $gameListContent.html('');
         $gamesCountLbl.text(data.gamesCount);
         $noGamesLbl.toggle(data.gamesCount === 0);
         $gameListContent.toggle(data.gamesCount > 0);
-
-        console.log(data.templates);
 
         for (var property in data.games) {
             $gameListContent.append(buildGameBoardLine(data.games[property]));
@@ -111,7 +110,7 @@ $(function(){
     });
 
     socket.on('updateGameResult', function(game){
-        console.log('update game result');
+        log('score ' + game.score1 + ':' + game.score2, 'updateGameResult');
 
         $user1NameLbl.text(game.user1.name).css('color', game.user1.color);
 
@@ -128,7 +127,7 @@ $(function(){
     });
 
     socket.on('userJoinGame', function(user){
-        console.log('userJoinGame ' + user.name);
+        log(user.name, 'userJoinGame');
 
         toggleDropElement($user2MovePointer);
         showNotification(user.name + ' has joined the game');
@@ -139,7 +138,8 @@ $(function(){
     });
 
     socket.on('serverUserLeftGame', function(user){
-        console.log('server User Left');
+        log(user.name, 'serverUserLeftGame');
+
         showGameFieldOverlay('Opponent has left the game, join another or start your own', false);
 
         showNotification('User ' + user.name + 'has left the game');
@@ -147,7 +147,7 @@ $(function(){
     });
 
     socket.on('userLeftGame', function(user){
-        console.log('userLeftGame ' + user.name);
+        log(user.name, 'userLeftGame');
 
         showNotification(user.name + ' has left the game');
         showGameFieldOverlay('User has left the game, waiting for another', false);
@@ -155,7 +155,7 @@ $(function(){
     });
 
     socket.on('showOpponentMove', function(data) {
-        console.log('opponent moved ' + data.move.x + ':' + data.move.y);
+        log('move ' + data.move.x + ':' + data.move.y, 'showOpponentMove');
 
         isYourTurn = true;
 
@@ -172,7 +172,7 @@ $(function(){
     });
 
     socket.on('showMatchResult', function(data) {
-        console.log('match result ' + (data.isTie ? 'tie' : data.winner.name));
+        log((data.isTie ? 'tie' : data.winner.name), 'showMatchResult');
 
         var message;
 
@@ -201,6 +201,7 @@ $(function(){
     });
 
     socket.on('newMatch', function(game) {
+        log(null, 'newMatch');
 
         if(game.startMatch.id === socket.id){
             isYourTurn = true;
@@ -219,7 +220,7 @@ $(function(){
     });
 
     function playAgain(){
-        console.log('play again');
+        log('you', 'playAgain', true);
 
         showGameFieldOverlay('Waiting for opponent response', false);
 
@@ -280,6 +281,8 @@ $(function(){
     }
 
     function addMessage(){
+        log('you send: ' + $messageTxt.val(), 'newMessage', true);
+
         socket.emit('newMessage', {
             message: $messageTxt.val(),
             userId: socket.id
@@ -289,6 +292,8 @@ $(function(){
     }
 
     function createNewGame(){
+        log('you', 'newGame', true);
+
         socket.emit('newGame');
 
         isCross = false;
@@ -301,6 +306,8 @@ $(function(){
     }
 
     function leaveGame(){
+        log('you', 'leaveGame', true);
+
         socket.emit('leaveGame');
 
         hideGameArena();
@@ -321,8 +328,8 @@ $(function(){
         $user1MovePointer.hide();
         $user2MovePointer.show();
 
-        hideGameArenaOverlay();
         $gameArenaContentTurnOverlay.hide();
+        hideGameArenaOverlay();
         notifyAboutMove();
         initGameArena();
         showGameArena();
@@ -447,8 +454,8 @@ $(function(){
                                     .css('transition' , '');
     }
 
-    function log(message){
-        console.log(message);
+    function log(message, eventName, isSent){
+        console.log((eventName ? (isSent ? 'event sent:' : 'event received:') + eventName + ' ' : '') + (message ? message : ''));
     }
 
     //init ui controls
