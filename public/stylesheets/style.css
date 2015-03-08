@@ -49,16 +49,20 @@ footer .alpha {
 
 .navbar {
     background: #31b0d5;
-    border: 1px solid #46b8da;
+    border-bottom: 1px solid #388dad;
+    -webkit-box-shadow: 0 2px 2px -2px #000000;
+    box-shadow: 0 2px 2px -2px #000000;
     text-align: center;
     padding: 10px 0 0 0;
 }
 
 .navbar .brand {
-    text-shadow: 3px 2px 0px #1d9d74, 2px 2px 0px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 -1px #388dad;
     color: #fff;
     font-weight: 300;
     font-size: 20px;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
 }
 
 #gameContent,

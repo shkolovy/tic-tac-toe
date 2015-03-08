@@ -112,8 +112,12 @@
     z-index: 11;
 }
 
+#gameFieldBlockTurnOverlay{
+    background: rgba(255, 255, 255, 0.1);
+}
+
 #gameFieldOverlay {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.7);
     padding: 85px 20px;
     text-align: center;
 }

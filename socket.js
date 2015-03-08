@@ -108,6 +108,13 @@ module.exports = function(server){
 
             game.user2 = user;
             game.startMatch = user;
+            game.score1 = 0;
+            game.score2 = 0;
+            game.hasWinner = false;
+            game.arena = new board();
+            game.ready1 = false;
+            game.ready2 = false;
+            game.startMatch = user;
 
             users[socket.id].gameId = game.id;
             users[socket.id].opponentId = game.user1.id;
@@ -120,6 +127,8 @@ module.exports = function(server){
             io.to('gameRoom' + data.gameId).emit('updateGameResult', game);
 
             io.to(game.user1.id).emit('userJoinGame', user);
+
+            io.to('gameRoom' + game.id).emit('updateGameResult', game);
 
             io.emit('updateGameBoardLine', {
                 game: game,

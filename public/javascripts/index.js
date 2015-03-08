@@ -5,19 +5,19 @@
 $(function(){
     var ANIMATION_SPEED = 400,
         HIGHLIGHT_DURATION = 1000,
+        NOTIFY_MOVE_TIME = 5000,
         ENTER_KEY = 13,
         CROSS_CSS = 'cross',
         ZERO_CSS = 'zero',
         CHECKED_CSS = 'checked',
         CROSS_TURN_CSS = 'cross-turn',
         ZERO_TURN_CSS = 'zero-turn',
-        NOTIFY_MOVE_TIME = 5000,
 
         socket = io.connect(),
 
         moveTimeOut,
 
-        userName = 'none',
+        userName,
         isYourTurn = false,
         isUser1 = false,
         isCross = false,
@@ -56,6 +56,8 @@ $(function(){
 
     //events
     socket.on('updateUsersCount', function(count){
+        log('');
+
         $usersOnlineCountLbl.text(count);
     });
 
@@ -132,27 +134,25 @@ $(function(){
 
         toggleDropElement($user2MovePointer);
         showNotification(user.name + ' has joined the game');
-        $gameFieldOverlay.hide();
+        hideGameFieldOverlay();
+        clearGameArena();
+
         $gameFieldBlockTurnOverlay.show();
     });
 
     socket.on('serverUserLeftGame', function(user){
         console.log('server User Left');
+        showGameFieldOverlay('Opponent has left the game, join another or start your own', false);
 
-        $gameFieldOverlay.show();
-        $playAgainBtn.hide();
-        $gameInfoLbl.text('Opponent has left the game, join another or start your own');
         showNotification('User ' + user.name + 'has left the game');
-        hideTurnIndicators
+        hideTurnIndicators();
     });
 
     socket.on('userLeftGame', function(user){
         console.log('userLeftGame ' + user.name);
 
         showNotification(user.name + ' has left the game');
-        $gameInfoLbl.text('User has left the game, waiting for another');
-        $playAgainBtn.hide();
-        $gameFieldOverlay.show();
+        showGameFieldOverlay('User has left the game, waiting for another', false);
         hideTurnIndicators();
     });
 
@@ -176,8 +176,10 @@ $(function(){
     socket.on('showMatchResult', function(data) {
         console.log('match result ' + (data.isDraw ? 'tie' : data.winner.name));
 
+        var message;
+
         if(data.isDraw){
-            $gameInfoLbl.text('tie');
+            message = 'tie';
         }
         else{
             //debugger;
@@ -190,30 +192,40 @@ $(function(){
                 });
             });
 
-            $gameInfoLbl.text(data.winner.id === socket.id ? 'You Won' : 'You Lost');
+            message = data.winner.id === socket.id ? 'You Won' : 'You Lost';
         }
+
+        hideTurnIndicators();
 
         //block game arena after winning animation
         setTimeout(function(){
-            $playAgainBtn.show();
-            $gameFieldOverlay.show();
+            showGameFieldOverlay(message, true);
         }, HIGHLIGHT_DURATION + 100);
     });
 
     socket.on('newMatch', function(game) {
-        $gameFieldOverlay.hide();
+
         if(game.startMatch.id === socket.id){
+            isYourTurn = true;
             $gameFieldBlockTurnOverlay.hide();
+            toggleDropElement(isUser1 ? $user1MovePointer : $user2MovePointer);
         }
+        else{
+            isYourTurn = false;
+            toggleDropElement(isUser1 ? $user2MovePointer : $user1MovePointer);
+        }
+
+        isCross = !isCross;
         clearGameArena();
+        initGameField();
+        hideGameFieldOverlay();
     });
 
     function playAgain(){
         console.log('play again');
 
-        $playAgainBtn.hide();
-        $gameInfoLbl.text('Waiting for opponent response');
-        //$gameFieldOverlay.hide();
+        showGameFieldOverlay('Waiting for opponent response', false);
+
         socket.emit('playAgain');
     }
 
@@ -285,12 +297,8 @@ $(function(){
         isCross = false;
         isUser1 = true;
 
-        $user1MovePointer.hide();
-        $user2MovePointer.hide();
-
-        $gameFieldOverlay.show();
-        $gameInfoLbl.text('Waiting for opponent');
-
+        showGameFieldOverlay('Waiting for opponent', false);
+        hideTurnIndicators();
         initGameField();
         showGameField();
     }
@@ -313,10 +321,11 @@ $(function(){
         isYourTurn = true;
         isCross = true;
 
-        $gameFieldOverlay.hide();
         $user1MovePointer.hide();
         $user2MovePointer.show();
 
+        hideGameFieldOverlay();
+        $gameFieldBlockTurnOverlay.hide();
         notifyAboutMove();
         initGameField();
         showGameField();
@@ -398,6 +407,7 @@ $(function(){
     function hideTurnIndicators(){
         $user1MovePointer.hide();
         $user2MovePointer.hide();
+        clearTimeout(moveTimeOut);
     }
 
     function showWhoseTurn(){
@@ -417,6 +427,17 @@ $(function(){
         });
     }
 
+    function hideGameFieldOverlay(){
+        $gameFieldOverlay.hide();
+        $playAgainBtn.hide();
+    }
+
+    function showGameFieldOverlay(message, showPlayAgain){
+        $gameFieldOverlay.show();
+        $gameInfoLbl.text(message);
+        $playAgainBtn.toggle(showPlayAgain);
+    }
+
     function hideGameField(){
         $gameAreaContent.fadeOut(ANIMATION_SPEED, function(){
             $findGameContent.show();
@@ -424,13 +445,18 @@ $(function(){
     }
 
     function clearGameArena(){
-        $gameFieldLbl.find('label').removeClass(CROSS_CSS)
-                                    .removeClass(ZERO_CSS)
-                                    .removeClass(CHECKED_CSS);
+        $gameFieldLbl.find('label').css('transition' , 'none').removeClass(CROSS_CSS)
+                                    .removeClass(ZERO_CSS).removeClass(CHECKED_CSS)
+                                    .css('transition' , '');
+    }
+
+    //TODO:add colors
+    function log(message){
+        console.log(message);
     }
 
     //init ui controls
-    $addMessageBtn.on('click', addMessage);
+    //$addMessageBtn.on('click', addMessage);
     $createGameBtn.on('click', createNewGame);
     $leaveGameBtn.on('click', leaveGame);
     $messageTxt.on('keypress', addMessageOnEnterClick);
@@ -438,13 +464,6 @@ $(function(){
     $gameBoardLines.on('click', 'button', joinGame);
     $gameFieldLbl.on('click', 'label', move);
     $playAgainBtn.on('click', playAgain);
-
     $userNameTxt.select();
     $('[data-toggle="tooltip"]').tooltip();
 });
-
-
-//$('#gameFieldLbl .checked').css('transition' , 'none');
-//$('#gameFieldLbl .checked').effect("highlight", {}, 1000, function(){
-//    $(this).css('transition' , '');
-//});
