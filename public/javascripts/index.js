@@ -132,8 +132,8 @@ $(function(){
 
         toggleDropElement($user2MovePointer);
         showNotification(user.name + ' has joined the game');
-        hideGameFieldOverlay();
-        clearGameArena();
+        hideGameArenaOverlay();
+        clearGameArenaContent();
 
         $gameArenaContentTurnOverlay.show();
     });
@@ -213,9 +213,9 @@ $(function(){
         }
 
         isCross = !isCross;
-        clearGameArena();
-        initGameField();
-        hideGameFieldOverlay();
+        clearGameArenaContent();
+        initGameArena();
+        hideGameArenaOverlay();
     });
 
     function playAgain(){
@@ -296,15 +296,15 @@ $(function(){
 
         showGameFieldOverlay('Waiting for opponent', false);
         hideTurnIndicators();
-        initGameField();
-        showGameField();
+        initGameArena();
+        showGameArena();
     }
 
     function leaveGame(){
         socket.emit('leaveGame');
 
-        hideGameField();
-        clearGameArena();
+        hideGameArena();
+        clearGameArenaContent();
     }
 
     function joinGame(){
@@ -321,11 +321,11 @@ $(function(){
         $user1MovePointer.hide();
         $user2MovePointer.show();
 
-        hideGameFieldOverlay();
+        hideGameArenaOverlay();
         $gameArenaContentTurnOverlay.hide();
         notifyAboutMove();
-        initGameField();
-        showGameField();
+        initGameArena();
+        showGameArena();
     }
 
     function enterNameOnEnterClick(e){
@@ -414,17 +414,17 @@ $(function(){
         $gameArenaContentTurnOverlay.toggle(!isYourTurn);
     }
 
-    function initGameField(){
+    function initGameArena(){
         $gameArenaContent.toggleClass(ZERO_TURN_CSS, !isCross).toggleClass(CROSS_TURN_CSS, isCross);
     }
 
-    function showGameField(){
+    function showGameArena(){
         $gameListContainer.fadeOut(ANIMATION_SPEED, function(){
             $gameArenaContainer.show();
         });
     }
 
-    function hideGameFieldOverlay(){
+    function hideGameArenaOverlay(){
         $gameArenaContentOverlay.hide();
         $playAgainBtn.hide();
     }
@@ -435,13 +435,13 @@ $(function(){
         $playAgainBtn.toggle(showPlayAgain);
     }
 
-    function hideGameField(){
+    function hideGameArena(){
         $gameArenaContainer.fadeOut(ANIMATION_SPEED, function(){
             $gameListContainer.show();
         });
     }
 
-    function clearGameArena(){
+    function clearGameArenaContent(){
         $gameArenaContent.find('label').css('transition' , 'none').removeClass(CROSS_CSS)
                                     .removeClass(ZERO_CSS).removeClass(CHECKED_CSS)
                                     .css('transition' , '');
@@ -452,7 +452,6 @@ $(function(){
     }
 
     //init ui controls
-    //$addMessageBtn.on('click', addMessage);
     $createGameBtn.on('click', createNewGame);
     $leaveGameBtn.on('click', leaveGame);
     $messageTxt.on('keypress', addMessageOnEnterClick);
