@@ -5,7 +5,7 @@
 $(function(){
     var ANIMATION_SPEED = 400,
         HIGHLIGHT_DURATION = 1000,
-        NOTIFY_MOVE_TIME = 5000,
+        NOTIFY_MOVE_TIME = 3000,
         ENTER_KEY = 13,
         CROSS_CSS = 'cross',
         ZERO_CSS = 'zero',
@@ -29,19 +29,18 @@ $(function(){
         $userNameTxt = $('#userNameTxt'),
         $userNameContainer = $('#userNameContainer'),
         $userNameLbl = $('#userNameLbl'),
-        $messagesLbl = $('#messagesLbl'),
+        $messagesContent = $('#messagesContent'),
         $messageTxt = $('#messageTxt'),
         $messageContainer = $('#messageContainer'),
         $usersOnlineCountLbl = $('#usersOnlineCountLbl'),
-        $findGameContent = $('#findGameContent'),
-        $gameAreaContent = $('#gameAreaContent'),
-        $addMessageBtn = $('#addMessageBtn'),
+        $gameListContainer = $('#gameListContainer'),
+        $gameArenaContainer = $('#gameArenaContainer'),
         $createGameBtn = $('#createGameBtn'),
-        $gameFieldLbl = $('#gameFieldLbl'),
+        $gameArenaContent = $('#gameArenaContent'),
         $leaveGameBtn = $('#leaveGameBtn'),
         $noGamesLbl = $('#noGamesLbl'),
         $gamesCountLbl = $('#gamesCountLbl'),
-        $gameBoardLines = $('#gameBoardLines'),
+        $gameListContent = $('#gameListContent'),
         $user1NameLbl = $('#user1NameLbl'),
         $user2NameLbl = $('#user2NameLbl'),
         $user1ScoreLbl = $('#user1ScoreLbl'),
@@ -50,9 +49,8 @@ $(function(){
         $user2MovePointer = $('#user2MovePointer'),
         $gameInfoLbl = $('#gameInfoLbl'),
         $playAgainBtn = $('#playAgainBtn'),
-        $user2Container = $('#user2Container'),
-        $gameFieldOverlay = $('#gameFieldOverlay'),
-        $gameFieldBlockTurnOverlay = $('#gameFieldBlockTurnOverlay');
+        $gameArenaContentOverlay = $('#gameArenaContentOverlay'),
+        $gameArenaContentTurnOverlay = $('#gameArenaContentTurnOverlay');
 
     //events
     socket.on('updateUsersCount', function(count){
@@ -64,7 +62,7 @@ $(function(){
     socket.on('userLeft', function(data){
         console.log('user left ' + data.userName);
 
-        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) +
+        $messagesContent.append('<div><span class="text-muted">[' + getFormattedTime(data.time) +
         ']</span> <span style="color:#d9534f">' + data.userName + '</span> has left</div>');
     });
 
@@ -72,26 +70,26 @@ $(function(){
         console.log('user joined ' + data.name);
 
         if(data.user.id === socket.id){
-            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> Welcome to chat ;)</div>');
+            $messagesContent.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> Welcome to chat ;)</div>');
         }
         else{
-            $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:'
+            $messagesContent.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:'
             + data.user.color + '">' + data.user.name + '</span> has joined</div>');
         }
     });
 
     socket.on('showMessage', function(data){
         console.log('message from ' + (data.user.id === socket.id ? 'you' : data.user.name) + ': ' + data.message);
-        $messagesLbl.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:' + data.user.color + '">' +
+        $messagesContent.append('<div><span class="text-muted">[' + getFormattedTime(data.time) + ']</span> <span style="color:' + data.user.color + '">' +
                             (data.user.id === socket.id ? 'you' : data.user.name) + '</span>: ' + data.message + '</div>');
 
-        $messageContainer.animate({ scrollTop: $messagesLbl.height() }, 400);
+        $messageContainer.animate({ scrollTop: $messagesContent.height() }, 400);
     });
 
     socket.on('updateGameBoardLine', function(data){
         console.log('update Game Board ' + data.game.id);
 
-        $gameBoardLines.toggle(data.gamesCount > 0);
+        $gameListContent.toggle(data.gamesCount > 0);
         $noGamesLbl.toggle(data.gamesCount === 0);
         $gamesCountLbl.text(data.gamesCount);
         updateGameBoardLine(data.game);
@@ -100,15 +98,15 @@ $(function(){
     socket.on('refreshGameBoard', function(data){
         console.log('refresh Game Board');
 
-        $gameBoardLines.html('');
+        $gameListContent.html('');
         $gamesCountLbl.text(data.gamesCount);
         $noGamesLbl.toggle(data.gamesCount === 0);
-        $gameBoardLines.toggle(data.gamesCount > 0);
+        $gameListContent.toggle(data.gamesCount > 0);
 
         console.log(data.templates);
 
         for (var property in data.games) {
-            $gameBoardLines.append(buildGameBoardLine(data.games[property]));
+            $gameListContent.append(buildGameBoardLine(data.games[property]));
         }
     });
 
@@ -137,7 +135,7 @@ $(function(){
         hideGameFieldOverlay();
         clearGameArena();
 
-        $gameFieldBlockTurnOverlay.show();
+        $gameArenaContentTurnOverlay.show();
     });
 
     socket.on('serverUserLeftGame', function(user){
@@ -161,11 +159,11 @@ $(function(){
 
         isYourTurn = true;
 
-        $gameFieldLbl.find('label[data-x=' + data.move.x + '][data-y=' + data.move.y + ']')
+        $gameArenaContent.find('label[data-x=' + data.move.x + '][data-y=' + data.move.y + ']')
                     .addClass(CHECKED_CSS).addClass(isCross ? ZERO_CSS : CROSS_CSS);
 
         if(data.hasWinner){
-            $gameFieldBlockTurnOverlay.show();
+            $gameArenaContentTurnOverlay.show();
         }
         else{
             showWhoseTurn();
@@ -183,7 +181,7 @@ $(function(){
         }
         else{
             $.each(data.winCombination, function(i, move){
-                var $el = $gameFieldLbl.find('label[data-x=' + move.x + '][data-y=' + move.y + ']');
+                var $el = $gameArenaContent.find('label[data-x=' + move.x + '][data-y=' + move.y + ']');
 
                 $el.css('transition' , 'none');
                 $el.effect("highlight", {}, HIGHLIGHT_DURATION, function(){
@@ -206,7 +204,7 @@ $(function(){
 
         if(game.startMatch.id === socket.id){
             isYourTurn = true;
-            $gameFieldBlockTurnOverlay.hide();
+            $gameArenaContentTurnOverlay.hide();
             toggleDropElement(isUser1 ? $user1MovePointer : $user2MovePointer);
         }
         else{
@@ -256,7 +254,7 @@ $(function(){
     }
 
     function updateGameBoardLine(game){
-        var $existingGameLine = $gameBoardLines.find('*[data-game-id="'+ game.id +'"]');
+        var $existingGameLine = $gameListContent.find('*[data-game-id="'+ game.id +'"]');
 
         if(!game.isRemoved){
             var gameLine = buildGameBoardLine(game);
@@ -265,7 +263,7 @@ $(function(){
                 $existingGameLine.replaceWith(gameLine);
             }
             else{
-                $gameBoardLines.append(gameLine);
+                $gameListContent.append(gameLine);
             }
         }
         else{
@@ -324,7 +322,7 @@ $(function(){
         $user2MovePointer.show();
 
         hideGameFieldOverlay();
-        $gameFieldBlockTurnOverlay.hide();
+        $gameArenaContentTurnOverlay.hide();
         notifyAboutMove();
         initGameField();
         showGameField();
@@ -413,43 +411,42 @@ $(function(){
         toggleDropElement($user1MovePointer);
         toggleDropElement($user2MovePointer);
 
-        $gameFieldBlockTurnOverlay.toggle(!isYourTurn);
+        $gameArenaContentTurnOverlay.toggle(!isYourTurn);
     }
 
     function initGameField(){
-        $gameFieldLbl.toggleClass(ZERO_TURN_CSS, !isCross).toggleClass(CROSS_TURN_CSS, isCross);
+        $gameArenaContent.toggleClass(ZERO_TURN_CSS, !isCross).toggleClass(CROSS_TURN_CSS, isCross);
     }
 
     function showGameField(){
-        $findGameContent.fadeOut(ANIMATION_SPEED, function(){
-            $gameAreaContent.show();
+        $gameListContainer.fadeOut(ANIMATION_SPEED, function(){
+            $gameArenaContainer.show();
         });
     }
 
     function hideGameFieldOverlay(){
-        $gameFieldOverlay.hide();
+        $gameArenaContentOverlay.hide();
         $playAgainBtn.hide();
     }
 
     function showGameFieldOverlay(message, showPlayAgain){
-        $gameFieldOverlay.show();
+        $gameArenaContentOverlay.show();
         $gameInfoLbl.text(message);
         $playAgainBtn.toggle(showPlayAgain);
     }
 
     function hideGameField(){
-        $gameAreaContent.fadeOut(ANIMATION_SPEED, function(){
-            $findGameContent.show();
+        $gameArenaContainer.fadeOut(ANIMATION_SPEED, function(){
+            $gameListContainer.show();
         });
     }
 
     function clearGameArena(){
-        $gameFieldLbl.find('label').css('transition' , 'none').removeClass(CROSS_CSS)
+        $gameArenaContent.find('label').css('transition' , 'none').removeClass(CROSS_CSS)
                                     .removeClass(ZERO_CSS).removeClass(CHECKED_CSS)
                                     .css('transition' , '');
     }
 
-    //TODO:add colors
     function log(message){
         console.log(message);
     }
@@ -460,8 +457,8 @@ $(function(){
     $leaveGameBtn.on('click', leaveGame);
     $messageTxt.on('keypress', addMessageOnEnterClick);
     $userNameTxt.on('keypress', enterNameOnEnterClick);
-    $gameBoardLines.on('click', 'button', joinGame);
-    $gameFieldLbl.on('click', 'label', move);
+    $gameListContent.on('click', 'button', joinGame);
+    $gameArenaContent.on('click', 'label', move);
     $playAgainBtn.on('click', playAgain);
     $userNameTxt.select();
     $('[data-toggle="tooltip"]').tooltip();

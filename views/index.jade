@@ -3,8 +3,8 @@ extends layout
 block content
     div#content(style='display:none')
         div.row
-            div#gameContent.col-md-6
-                div#findGameContent
+            div#gameContainer.col-md-6
+                div#gameListContainer
                     div.panel.panel-info
                         div.panel-heading
                             h3.panel-title games board
@@ -13,11 +13,11 @@ block content
                             div No active games
                             i.fa.fa-gamepad
                             div But, you can start a new one!
-                        ul#gameBoardLines.list-group
+                        ul#gameListContent.list-group
                     button#createGameBtn.btn.btn-warning
                         span.glyphicon.glyphicon-chevron-right
                         |&nbsp;create new game
-                div#gameAreaContent(style='display:none')
+                div#gameArenaContainer(style='display:none')
                     table#gameTitleTable(style='margin-top:-14px')
                         tr
                             td.user-move-pointer-container
@@ -27,7 +27,7 @@ block content
                                 i#user2MovePointer.move-pointer.glyphicon.glyphicon-triangle-bottom
                         tr
                             td#user1NameLbl
-                            td#userVs.text-muted vs
+                            td#userVsLbl.text-muted vs
                             td#user2NameLbl
                         tr
                             td.cup
@@ -35,7 +35,7 @@ block content
                             td
                             td.cup
                                 span#user2ScoreLbl
-                    div#gameFieldLbl.tic-tac-toe.cross-turn
+                    div#gameArenaContent.tic-tac-toe.cross-turn
                         label.left.top(data-x='0', data-y='0')
                         label.middle.top(data-x='0', data-y='1')
                         label.right.top(data-x='0', data-y='2')
@@ -45,22 +45,19 @@ block content
                         label.left.bottom(data-x='2', data-y='0')
                         label.middle.bottom(data-x='2', data-y='1')
                         label.right.bottom(data-x='2', data-y='2')
-                        div#gameFieldBlockTurnOverlay(style='display:none')
-                        div#gameFieldOverlay(style='display:none')
+                        div#gameArenaContentTurnOverlay(style='display:none')
+                        div#gameArenaContentOverlay(style='display:none')
                             div#gameInfoLbl
                             button#playAgainBtn.btn(style='display:none') play again
                         button#leaveGameBtn.btn.btn-info
                             span.glyphicon.glyphicon-chevron-left
                             |leave game
-            div#chatContent.col-md-6
+            div#chatContainer.col-md-6
                 div.panel.panel-info
                     div.panel-heading
                         h3.panel-title chat room
                             span#usersOnlineCountLbl.badge.right(title='users online', data-toggle='tooltip') 1
                     div#messageContainer.panel-body
-                        div#messagesLbl
+                        div#messagesContent
                     div.panel-footer
                         input#messageTxt.form-control(type="text", placeholder="enter message", maxlength=300)
-
-
-

@@ -65,14 +65,14 @@ footer .alpha {
     font-smoothing: antialiased;
 }
 
-#gameContent,
-#chatContent {
+#gameContainer,
+#chatContainer {
     margin-bottom: 20px;
 }
 
-#chatContent .panel-body,
-#findGameContent .panel-body,
-#gameBoardLines {
+#chatContainer .panel-body,
+#gameListContainer .panel-body,
+#gameListContent {
     height: 450px;
     overflow: auto;
 }
@@ -87,12 +87,12 @@ footer .alpha {
     text-transform: capitalize;
 }
 
-#gameBoardLines button,
-#gameBoardLines .label-info {
+#gameListContent button,
+#gameListContent .label-info {
     float: right;
 }
 
-#gameBoardLines .label-info {
+#gameListContent .label-info {
     padding: 5px 5px;
 }
 
@@ -117,7 +117,7 @@ footer .alpha {
 
 #user1NameLbl,
 #user2NameLbl,
-#userVs {
+#userVsLbl {
     vertical-align: top;
     text-align: center;
     padding-bottom: 5px;
