@@ -1,6 +1,17 @@
-week-days-selector
+tic tac toe node.js sockets
 ===============================
 
-Bootstrap Week days selector (combobox)
+#0
+![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-0.png)
 
-[See the demo](http://artemdude.github.io/week-days-selector/index.html)
+#1
+![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-1.png)
+
+#2
+![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-2.png)
+
+#3
+![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-3.png)
+
+#4
+![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-4.png)
