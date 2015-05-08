@@ -4,13 +4,13 @@ tic tac toe node.js sockets
 #Login page
 ![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-0.png)
 
-#1
+#Live chat
 ![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-1.png)
 
-#2
+#Gameplay
 ![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-2.png)
 
-#3
+#Game board
 ![ScreenShot](https://raw.github.com/artemdude/tic-tac-toe/master/screenshots/ttt-3.png)
 
 #4
